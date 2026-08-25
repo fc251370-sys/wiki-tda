@@ -24,9 +24,12 @@ services:
       - ./apps/plantilla:/var/www
     working_dir: /var/www
     depends_on:
-      - pgsql
-      - redis
-      - mongodb
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     environment:
       - DB_HOST=plantilla_db
       - DB_PORT=5432
@@ -61,6 +64,11 @@ services:
       POSTGRES_PASSWORD: irwin
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d plantilla"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - plantilla_network
   
@@ -71,6 +79,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - plantilla_network
 
@@ -81,6 +94,11 @@ services:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - plantilla_network
 
@@ -91,4 +109,4 @@ volumes:
 
 networks:
   plantilla_network:
-    driver: bridge
+    driver: bridge
