@@ -12,11 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->id(); 
+            //se agrego desde aqui
+            $table->foreignId('carrera_id')
+                ->nullable()
+                ->constrained('carreras')
+                ->nullOnDelete();
+                //nullOnDelete() significa que si se elimina la carrera el usuario no se borra simplemente su carrera se queda vacia no se usa cascade porque si se borra una carrera se borrarian todos los usuarios
+            $table->string('name', 150);
+            $table->string('email', 150)->unique();
+            $table->string('password', 255);
+            $table->string('role', 20)->default('student');
+            $table->string('carnet_or_code', 50)->nullable();
+            //se agrego hasta aqui
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
