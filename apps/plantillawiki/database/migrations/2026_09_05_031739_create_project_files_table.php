@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('project_files', function (Blueprint $table) {
             $table->id();
             //se hiso de aca 
-            $table->foreignId('project_id')->contrained('projects')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
             $table->string('file_type', 20);
             $table->string('original_name', 255);
             $table->string('file_path', 255);
             $table->integer('file_size_kb');
             $table->string('extension', 10);
-            $table->timestamps('created_at')->useCurrent(); //hast aca
+            $table->timestamps(); //hast aca
         });
     }
     //project_id con cascadeOnDelete si se borra el proyecto se borra todo lo de el obio

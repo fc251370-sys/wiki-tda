@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('wiki_articles', function (Blueprint $table) {
             $table->id();
             //se agrego de aca
-            $table->foreignId('category_id')->contrained('wiki_categories')->restrictOnDelete();
-            $table->foreignId('author_id')->contrained('users')->cascadeOnDelete();
+            $table->foreignId('category_id')->constrained('wiki_categories')->restrictOnDelete();
+            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
             $table->string('title', 255);
             $table->string('slug', 280)->unique();
             $table->text('content');

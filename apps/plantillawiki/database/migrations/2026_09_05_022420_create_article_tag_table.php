@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('article_tag', function (Blueprint $table) {
             
-            $table->foreignId('article_id')-contrained('wiki_articles')->cascadeOnDelete();
-            $table->foreignId('tag_id')-contrained('wiki_tags')->cascadeOnDelete();
+            $table->foreignId('article_id')->constrained('wiki_articles')->cascadeOnDelete();
+            $table->foreignId('tag_id')->constrained('wiki_tags')->cascadeOnDelete();
+            
             
             // id de tabla pivote
             $table->primary(['article_id', 'tag_id']);

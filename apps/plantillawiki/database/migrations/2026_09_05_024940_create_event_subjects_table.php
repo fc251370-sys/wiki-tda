@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('event_subjects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->contrained('events')->cascadeOnDelete();
-            $table->foreignId('teacher_id')->contrained('users')->restrictOnDelete();
-            $table->foreignId('carrera_id')->contrained('carreras')->restrictOnDelete();
+            $table->foreignId('event_id')->constrained('events')->cascadeOnDelete();
+            $table->foreignId('teacher_id')->constrained('users')->restrictOnDelete();
+            $table->foreignId('carrera_id')->constrained('carreras')->restrictOnDelete();
             $table->string('subject_name', 150);
-            $table->timestamps('created_at')->useCurrent();
+            $table->timestamps();
         });
     }
 

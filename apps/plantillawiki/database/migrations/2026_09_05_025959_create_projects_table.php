@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_subject_id')->contrained('events_subjects')->cascadeOnDelete();
+            $table->foreignId('event_subject_id')->constrained('event_subjects')->cascadeOnDelete();
             $table->string('title', 200);
             $table->text('description')->nullable();
             $table->string('repository_url', 255)->nullable();

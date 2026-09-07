@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('coordinador_id')->constrained('users')->restrictOnDelete();
             $table->string('cicle_name', 50);
             $table->date('start_date');
-            $table->date('start_date');
             $table->boolean('is_active')->default(true);
             // hasta aca
             $table->timestamps();

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('project_members', function (Blueprint $table) {
             $table->id();
             //se agrego de aca 
-            $table->foreignId('project_id')->contrained('projects')->cascadeOnDelete();
-            $table->foreignId('student_id')->contrained('users')->cascadeOnDelete();
+            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
             $table->boolean('is_leader')->default(false);
             $table->primary(['project_id', 'student_id']); //hasta aca
             $table->timestamps();
