@@ -15,26 +15,38 @@ class UserSeeder extends Seeder
     {
         $user = User::create([
             'name' => 'admin',
-            'email' => 'admin@yopmail.com',
-            'password' => Hash::make('Admin123$'),
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('Admin1234'),
+            'role' => 'admin',
         ]);
 
         $user->assignRole('admin');
 
         $user = User::create([
-            'name' => 'user',
-            'email' => 'user@yopmail.com',
-            'password' => Hash::make('Admin123$'),
+            'name' => 'coordinador',
+            'email' => 'coordinador@gmail.com',
+            'password' => Hash::make('Coordinador1234'),
+            'role' => 'coordinador',
         ]);
 
-        $user->assignRole('user');
+        $user->assignRole('coordinador');
 
         $user = User::create([
-            'name' => 'viewer',
-            'email' => 'viewer@yopmail.com',
-            'password' => Hash::make('Admin123$'),
+            'name' => 'teacher',
+            'email' => 'teacher@gmail.com',
+            'password' => Hash::make('Teacher1234'),
+            'role' => 'teacher',
         ]);
 
-        $user->assignRole('viewer');
+        $user->assignRole('teacher');
+
+        $user = User::create([
+            'name' => 'student',
+            'email' => 'student@gmail.com',
+            'password' => Hash::make('Student1234'),
+            'role' => 'student',
+        ]);
+
+        $user->assignRole('student');
     }
 }

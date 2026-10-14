@@ -24,12 +24,17 @@ class RolSeeder extends Seeder
             ],
             [
                 'id' => 2,
-                'name' => 'user',
+                'name' => 'coordinador',
                 'guard_name' => 'api',
             ],
             [
                 'id' => 3,
-                'name' => 'viewer',
+                'name' => 'teacher',
+                'guard_name' => 'api',
+            ],
+            [
+                'id' => 4,
+                'name' => 'student',
                 'guard_name' => 'api',
             ],
         ];
@@ -52,14 +57,22 @@ class RolSeeder extends Seeder
                     'view_permission',
                 ]);
             }
-            if ($rol->name == 'user') {
+            if ($rol->name == 'coordinador') {
+                $rol->syncPermissions([
+                    'create_user',
+                    'edit_user',
+                    'delete_user',
+                    'view_user',
+                ]);
+            }
+            if ($rol->name == 'teacher') {
                 $rol->syncPermissions([
                     'create_user',
                     'edit_user',
                     'view_user',
                 ]);
             }
-            if ($rol->name == 'viewer') {
+            if ($rol->name == 'student') {
                 $rol->syncPermissions([
                     'view_user',
                 ]);
