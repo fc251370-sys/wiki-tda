@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
+use App\Http\Controllers\Api\Carrera\CarreraController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -20,4 +21,12 @@ Route::prefix('auth')->group(function () {
             Route::get('/', [RolesController::class, 'getPermissions']);
         });
     });
+});
+
+Route::middleware('auth:api')->prefix('carreras')->group(function () {
+    Route::get('/', [CarreraController::class, 'index']);
+    Route::post('/crear', [CarreraController::class, 'store']);
+    Route::get('/{id}', [CarreraController::class, 'showById']);
+    Route::put('/{id}', [CarreraController::class, 'update']);
+    Route::delete('/{id}', [CarreraController::class, 'destroy']);
 });

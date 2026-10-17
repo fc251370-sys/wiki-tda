@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 150); //se agrego esto
             $table->string('code', 20)->unique(); //se agrego esto
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

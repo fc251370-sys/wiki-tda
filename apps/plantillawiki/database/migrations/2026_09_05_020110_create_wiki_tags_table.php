@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50);   //se puso esto 
             $table->string('slug', 60)->unique();   //se puso esto 
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

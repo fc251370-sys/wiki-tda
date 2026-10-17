@@ -1,5 +1,7 @@
 FROM php:8.4-fpm
 
+ENV LOG_CHANNEL=stderr
+
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     libpng-dev \

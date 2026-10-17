@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name', 100);
             $table->string('slug', 120)->unique();
             $table->text('description')->nullable(); //hasta aca
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

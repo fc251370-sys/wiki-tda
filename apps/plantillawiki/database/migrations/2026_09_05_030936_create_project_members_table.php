@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
             $table->boolean('is_leader')->default(false);
             $table->primary(['project_id', 'student_id']); //hasta aca
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

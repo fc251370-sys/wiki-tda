@@ -15,6 +15,7 @@ return new class extends Migration
             
             $table->foreignId('article_id')->constrained('wiki_articles')->cascadeOnDelete();
             $table->foreignId('tag_id')->constrained('wiki_tags')->cascadeOnDelete();
+            $table->boolean('estado')->default(true);
             
             
             // id de tabla pivote
