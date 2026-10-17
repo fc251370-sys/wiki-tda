@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('slug', 280)->unique();
             $table->text('content');
             $table->boolean('is_published')->default(false);  //hast aca
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

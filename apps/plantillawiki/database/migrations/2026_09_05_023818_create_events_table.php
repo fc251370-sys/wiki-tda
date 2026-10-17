@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('cicle_name', 50);
             $table->date('start_date');
             $table->boolean('is_active')->default(true);
+            $table->boolean('estado')->default(true);
             // hasta aca
             $table->timestamps();
         });

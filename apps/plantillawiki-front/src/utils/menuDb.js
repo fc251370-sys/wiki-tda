@@ -6,6 +6,31 @@ export const menuItems = [
         roles:['admin','user','viewer']
     },
     {
+        title: 'Carrera',
+        icon: 'mdi-view-dashboard',
+        to: '/carrera',
+        roles:['admin','user','viewer']
+    },
+    {
+        title: 'Evento',
+        icon: 'mdi-view-dashboard',
+        to: '/evento',
+        roles:['admin','user','viewer']
+    },
+    {
+        title: 'Proyecto',
+        icon: 'mdi-view-dashboard',
+        to: '/proyecto',
+        roles:['admin','user','viewer']
+    },
+    {
+        title: 'Wiki',
+        icon: 'mdi-view-dashboard',
+        to: '/wiki',
+        roles:['admin','user','viewer']
+    },
+    
+    {
         title: 'Seguridad',
         icon: 'mdi-shield-lock',
         roles:['admin','viewer'],

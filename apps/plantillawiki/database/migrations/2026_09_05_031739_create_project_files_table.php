@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('file_path', 255);
             $table->integer('file_size_kb');
             $table->string('extension', 10);
+            $table->boolean('estado')->default(true);
             $table->timestamps(); //hast aca
         });
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('repository_url', 255)->nullable();
             $table->string('status', 20)->default('pending');
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

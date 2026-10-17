@@ -4,12 +4,13 @@ namespace App\Response;
 
 class ApiResponse{
     
-    public static function success($message = 'Success', $code = 200, $data = [])
+    public static function success($message = 'Success', $code = 200, $data = [], $pagination = [])
     {
         return response()->json([
             'message' => $message,
             'status' => $code,
             'data' => $data,
+            'pagination' => $pagination
         ], $code);
     }
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('teacher_id')->constrained('users')->restrictOnDelete();
             $table->foreignId('carrera_id')->constrained('carreras')->restrictOnDelete();
             $table->string('subject_name', 150);
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

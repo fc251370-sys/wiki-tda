@@ -6,6 +6,10 @@ import Home from '../view/Home.vue'
 import AdminDashboard from '../view/AdminDashboard.vue'
 import { routerAuth } from '../view/auth/router.js'
 import { configurationRouter } from '../view/configuracion/router.js'
+import { routerCarrera } from '../view/carrera/router.js'
+import { routerEvento } from '../view/evento/router.js'
+import { routerProyecto } from '../view/proyecto/router.js'
+import { routerWiki } from '../view/wiki/router.js'
 
 const routes = [
   {
@@ -35,7 +39,11 @@ const routes = [
           requiresAuth: true
         }
       },
-      ...configurationRouter
+      ...configurationRouter,
+      ...routerCarrera,
+      ...routerEvento,
+      ...routerProyecto,
+      ...routerWiki
     ],
     meta: {
       requiresAuth: true,
