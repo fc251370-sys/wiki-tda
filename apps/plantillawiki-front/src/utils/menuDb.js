@@ -12,6 +12,13 @@ export const menuItems = [
         guestOnly: true,
     },
     {
+        title: 'Dashboard',
+        icon: 'mdi-view-dashboard-outline',
+        to: '/admin',
+        requiresAuth: true,
+        roles: ['admin'],
+    },
+    {
         title: 'Carreras',
         icon: 'mdi-school-outline',
         to: '/carrera',
@@ -39,19 +46,14 @@ export const menuItems = [
         requiresAuth: true,
         roles: ['admin', 'coordinador', 'teacher', 'student'],
     },
+    
     {
         title: 'Administración',
         icon: 'mdi-shield-account-outline',
         requiresAuth: true,
         roles: ['admin'],
         children: [
-            {
-                title: 'Dashboard',
-                icon: 'mdi-view-dashboard-outline',
-                to: '/admin',
-                requiresAuth: true,
-                roles: ['admin'],
-            },
+            
             {
                 title: 'Usuarios',
                 icon: 'mdi-account-group-outline',
