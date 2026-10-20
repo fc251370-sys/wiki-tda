@@ -11,6 +11,7 @@ import { routerEvento } from '../view/evento/router.js'
 import { routerProyecto } from '../view/proyecto/router.js'
 import { routerWiki } from '../view/wiki/router.js'
 import { routerUsers } from '../view/users/router.js'
+import { getStoredList } from '../utils/access.js'
 const routes = [
   {
     path: '/',
@@ -36,7 +37,8 @@ const routes = [
         name: 'Dashboard',
         component: AdminDashboard,
         meta: {
-          requiresAuth: true
+          requiresAuth: true,
+          roles: ['admin'],
         }
       },
       ...configurationRouter,
@@ -60,11 +62,17 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     const isAuthenticated = !!localStorage.getItem('token');
+    const roles = getStoredList('roles');
 
     // Rutas protegidas
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!isAuthenticated) {
             return next({ name: 'Login' });
+        }
+
+        const requiredRoles = to.matched.flatMap(record => record.meta.roles ?? []);
+        if (requiredRoles.length && !requiredRoles.some(role => roles.includes(role))) {
+            return next({ path: '/wiki' });
         }
 
         return next();
@@ -73,7 +81,7 @@ router.beforeEach((to, from, next) => {
     // Rutas solo para invitados
     if (to.matched.some(record => record.meta.guestOnly)) {
         if (isAuthenticated) {
-            return next({ name: 'AdminDashboard' });
+            return next(roles.includes('admin') ? { name: 'Dashboard' } : { path: '/wiki' });
         }
 
         return next();

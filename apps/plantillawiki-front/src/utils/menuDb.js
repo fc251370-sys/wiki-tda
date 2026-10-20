@@ -1,64 +1,71 @@
 export const menuItems = [
     {
-        title: 'Dashboard',
-        icon: 'mdi-view-dashboard',
-        to: '/admin',
-        roles:['admin','user','viewer']
+        title: 'Inicio',
+        icon: 'mdi-home-outline',
+        to: '/',
+        guestOnly: true,
     },
     {
-        title: 'Carrera',
-        icon: 'mdi-view-dashboard',
+        title: 'Iniciar sesión',
+        icon: 'mdi-login',
+        to: '/login',
+        guestOnly: true,
+    },
+    {
+        title: 'Carreras',
+        icon: 'mdi-school-outline',
         to: '/carrera',
-        roles:['admin','user','viewer']
+        requiresAuth: true,
+        roles: ['admin', 'coordinador', 'teacher', 'student'],
     },
     {
-        title: 'Evento',
-        icon: 'mdi-view-dashboard',
+        title: 'Eventos',
+        icon: 'mdi-calendar-outline',
         to: '/evento',
-        roles:['admin','user','viewer']
+        requiresAuth: true,
+        roles: ['admin', 'coordinador', 'teacher', 'student'],
     },
     {
-        title: 'Proyecto',
-        icon: 'mdi-view-dashboard',
+        title: 'Proyectos',
+        icon: 'mdi-folder-outline',
         to: '/proyecto',
-        roles:['admin','user','viewer']
+        requiresAuth: true,
+        roles: ['admin', 'coordinador', 'teacher', 'student'],
     },
     {
         title: 'Wiki',
-        icon: 'mdi-view-dashboard',
+        icon: 'mdi-book-open-page-variant-outline',
         to: '/wiki',
-        roles:['admin','user','viewer']
+        requiresAuth: true,
+        roles: ['admin', 'coordinador', 'teacher', 'student'],
     },
     {
-        title: 'Usuarios',
-        icon: 'mdi-account',
-        to: '/usuarios',
-        roles:['admin','user','viewer']
-    },    
-    {
-        title: 'Seguridad',
-        icon: 'mdi-shield-lock',
-        roles:['admin','viewer'],
+        title: 'Administración',
+        icon: 'mdi-shield-account-outline',
+        requiresAuth: true,
+        roles: ['admin'],
         children: [
             {
-                title: 'Usuarios',
-                to: '/admin/users',
-                roles: [],
-                permisos: []
+                title: 'Dashboard',
+                icon: 'mdi-view-dashboard-outline',
+                to: '/admin',
+                requiresAuth: true,
+                roles: ['admin'],
             },
             {
-                title: 'Roles',
-                to: '/admin/roles',
-                roles: [],
-                permisos: ['create_rol','view_rol','edit_rol']
+                title: 'Usuarios',
+                icon: 'mdi-account-group-outline',
+                to: '/usuarios',
+                requiresAuth: true,
+                roles: ['admin'],
             },
-           
-        ]
+            {
+                title: 'Configuración',
+                icon: 'mdi-cog-outline',
+                to: '/admin/configuracion',
+                requiresAuth: true,
+                roles: ['admin'],
+            },
+        ],
     },
-    {
-        title: 'Configuración',
-        icon: 'mdi-cog',
-        to: '/admin/configuracion',
-         roles:['admin','user','viewer']
-    }
 ]
