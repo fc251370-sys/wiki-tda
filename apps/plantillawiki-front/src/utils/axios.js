@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useAlertStore } from "../store/useAlertStore";
+import { useLoadingStore } from "../store/useLoadingStore";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8005/api",
@@ -24,6 +25,9 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    config._globalLoaderTracked = true;
+    useLoadingStore().startLoading();
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -33,9 +37,21 @@ api.interceptors.request.use(
  * Interceptor de respuestas
  */
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.config._globalLoaderTracked) {
+      response.config._globalLoaderTracked = false;
+      useLoadingStore().finishLoading();
+    }
+
+    return response;
+  },
 
   (error) => {
+    if (error.config?._globalLoaderTracked) {
+      error.config._globalLoaderTracked = false;
+      useLoadingStore().finishLoading();
+    }
+
     const alertStore = useAlertStore();
 
     if (!error.response) {

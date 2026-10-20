@@ -1,85 +1,112 @@
 <script setup>
+import { computed } from 'vue';
 import { menuItems } from '../utils/menuDb';
-import { ref } from 'vue';
+import { getStoredList } from '../utils/access';
 
-const roles = JSON.parse(localStorage.getItem('roles')) || [];
-const permissions = JSON.parse(localStorage.getItem('permissions')) || [];
+const emit = defineEmits(['navigate']);
+const isAuthenticated = Boolean(localStorage.getItem('token'));
+const roles = getStoredList('roles');
+const permissions = getStoredList('permissions');
 
 const hasAccess = (item) => {
-    const requiresRoles = item.roles && item.roles.length > 0;
-    const requiresPermissions = item.permisos && item.permisos.length > 0;
-
-    // Si no requiere roles ni permisos, se permite el acceso
-    if (!requiresRoles && !requiresPermissions) {
-        return true;
-    }
-
-    // Validar roles
-    if (requiresRoles && item.roles.some(role => roles.includes(role))) {
-        return true;
-    }
-
-    // Validar permisos
-    if (requiresPermissions && item.permisos.some(permission => permissions.includes(permission))) {
-        return true;
-    }
-
+  if (item.guestOnly && isAuthenticated) {
     return false;
+  }
+
+  if (item.requiresAuth && !isAuthenticated) {
+    return false;
+  }
+
+  const hasRoleRequirement = item.roles?.length > 0;
+  const hasPermissionRequirement = item.permisos?.length > 0;
+
+  if (hasRoleRequirement && !item.roles.some((role) => roles.includes(role))) {
+    return false;
+  }
+
+  if (
+    hasPermissionRequirement &&
+    !item.permisos.some((permission) => permissions.includes(permission))
+  ) {
+    return false;
+  }
+
+  return true;
 };
 
-const filterMenu = (items) => {
-    return items
-        .filter(hasAccess)
-        .map(item => {
-            if (item.children) {
-                const filteredChildren = filterMenu(item.children);
-                return { ...item, children: filteredChildren };
-            }
-            return item;
-        })
-        // Ocultar grupos que se quedaron sin hijos después de filtrar
-        .filter(item => !item.children || item.children.length > 0);
-};
+const filterMenu = (items) =>
+  items
+    .filter(hasAccess)
+    .map((item) => {
+      if (!item.children) {
+        return item;
+      }
 
-const menu = ref(filterMenu(menuItems));
+      return {
+        ...item,
+        children: filterMenu(item.children),
+      };
+    })
+    .filter((item) => !item.children || item.children.length > 0);
 
+const menu = computed(() => filterMenu(menuItems));
 </script>
 
 <template>
-    <v-list density="comfortable" nav>
-        <template v-for="item in menu" :key="item.title">
+  <v-list class="sidebar-menu" color="primary" density="comfortable" nav>
+    <template v-for="item in menu" :key="item.title">
+      <v-list-item
+        v-if="!item.children"
+        :to="item.to"
+        :prepend-icon="item.icon"
+        :title="item.title"
+        active-class="sidebar-menu__item--active"
+        exact
+        @click="emit('navigate')"
+      />
 
-            <!-- Item simple -->
-            <v-list-item
-                v-if="!item.children"
-                :to="item.to"
-                :prepend-icon="item.icon"
-                :title="item.title"
-                exact
-            />
-
-            <!-- Grupo -->
-            <v-list-group
-                v-else
-                :value="item.title"
-            >
-                <template #activator="{ props }">
-                    <v-list-item
-                        v-bind="props"
-                        :prepend-icon="item.icon"
-                        :title="item.title"
-                    />
-                </template>
-
-                <v-list-item
-                    v-for="child in item.children"
-                    :key="child.title"
-                    :to="child.to"
-                    :title="child.title"
-                    exact
-                />
-            </v-list-group>
-
+      <v-list-group v-else :value="item.title">
+        <template #activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            :prepend-icon="item.icon"
+            :title="item.title"
+          />
         </template>
-    </v-list>
+
+        <v-list-item
+          v-for="child in item.children"
+          :key="child.title"
+          :to="child.to"
+          :prepend-icon="child.icon"
+          :title="child.title"
+          active-class="sidebar-menu__item--active"
+          exact
+          @click="emit('navigate')"
+        />
+      </v-list-group>
+    </template>
+  </v-list>
 </template>
+
+<style scoped>
+.sidebar-menu {
+  padding: 16px 12px;
+}
+
+.sidebar-menu :deep(.v-list-item) {
+  min-height: 46px;
+  margin-bottom: 4px;
+  border-radius: 10px;
+  
+}
+
+.sidebar-menu :deep(.v-list-item--active) {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+}
+
+.sidebar-menu :deep(.v-list-item--active .v-icon) {
+  color: rgb(var(--v-theme-on-primary));
+}
+</style>
