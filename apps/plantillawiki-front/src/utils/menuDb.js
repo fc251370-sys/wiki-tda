@@ -29,7 +29,12 @@ export const menuItems = [
         to: '/wiki',
         roles:['admin','user','viewer']
     },
-    
+    {
+        title: 'Usuarios',
+        icon: 'mdi-account',
+        to: '/usuarios',
+        roles:['admin','user','viewer']
+    },    
     {
         title: 'Seguridad',
         icon: 'mdi-shield-lock',

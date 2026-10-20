@@ -10,7 +10,7 @@ import { routerCarrera } from '../view/carrera/router.js'
 import { routerEvento } from '../view/evento/router.js'
 import { routerProyecto } from '../view/proyecto/router.js'
 import { routerWiki } from '../view/wiki/router.js'
-
+import { routerUsers } from '../view/users/router.js'
 const routes = [
   {
     path: '/',
@@ -43,7 +43,8 @@ const routes = [
       ...routerCarrera,
       ...routerEvento,
       ...routerProyecto,
-      ...routerWiki
+      ...routerWiki,
+      ...routerUsers
     ],
     meta: {
       requiresAuth: true,
