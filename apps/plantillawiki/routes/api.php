@@ -23,7 +23,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::middleware('auth:api')->prefix('carreras')->group(function () {
+Route::prefix('carreras')->group(function () {
     Route::get('/', [CarreraController::class, 'index']);
     Route::post('/crear', [CarreraController::class, 'store']);
     Route::get('/{id}', [CarreraController::class, 'showById']);
