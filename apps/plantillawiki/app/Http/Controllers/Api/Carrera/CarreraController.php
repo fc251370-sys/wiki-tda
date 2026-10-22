@@ -25,8 +25,39 @@ class CarreraController extends Controller
     public function index(Request $request)
     {
         //
-        $carreras = Carrera::all();
-        return ApiResponse::success('Listado carreras', 200, $carreras);
+        try {
+            $carreras = Carrera::with(['users']);
+                if($request->has('name')){
+                $carreras->where('name','ilike','%'.$request->name.'%');
+            }
+            
+            $carrerasPaginated = $carreras->paginate(10);
+
+            $paginationData = [
+                'current_page' => $carrerasPaginated->currentPage(),
+                'last_page' => $carrerasPaginated->lastPage(),
+                'per_page' => $carrerasPaginated->perPage(),
+                'total' => $carrerasPaginated->total(),
+            ];
+            
+            $carrerasFormated = $carrerasPaginated->map(function ($carrera) {
+                return [
+                    'id' => $carrera->id,
+                    'name' => $carrera->name,
+                    'code' => $carrera->code,
+                    'estado' => $carrera->estado,
+                    'users' => $carrera->users->map(fn ($user) => [ 
+                        'id'=> $user->id,
+                        'name' => $carrera->users->name,
+                        'email' => $carrera->users->email,
+                    ]),
+                ];
+            });
+        return ApiResponse::success('listado de carreras',200, $carrerasFormated,$paginationData);
+
+        } catch (\Exception $e) {
+            return ApiResponse::error('Error al obtener los carreras',500, $e->getMessage());
+        }
     }
 
     /**
@@ -36,18 +67,34 @@ class CarreraController extends Controller
     {
         //
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'code' => 'nullable|string',
+            $messages = [
+                'name.required'=>'Los nombres son requeridos',
+                'name.string'=>'Los nombres solo deben tener texto',
+                'code.string'=>'El código solo debe tener texto',
+                'code.unique'=>'El código ya existe'
+            ];
+            $validator = Validator::make($request->all(),[
+                'name' => 'required|string|max:150,min:3',
+                'code' => 'nullable|string|min:3|max:150|unique:carreras,code',
+            ],$messages);
+            
+            if($validator->fails()){
+                return ApiResponse::error($validator->errors()->first(),422);
+            }
+
+            //creacion carrera
+            $carrera = Carrera::create([
+                'name'=>$request->name,
+                'code'=>$request->code,
             ]);
 
-            $carrera = Carrera::create($request->all());
-
-            return ApiResponse::success('Carrera creada exitosamente', 201, $carrera);
+            return ApiResponse::success('Carrera creada correctamente',201);
         } catch (\Exception $e) {
-            return ApiResponse::error('Error no se creo la carrera: ' . $e->getMessage(), 500);
+            //throw $th;
+            return ApiResponse::error('Error al crear la carrera '.$e->getMessage());
         }
     }
+    
 
     //obtener por id
     public function showById(Request $request, $id)

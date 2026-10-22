@@ -43,6 +43,10 @@ const props = defineProps({
   page:{
     type:Number,
     default:1
+  },
+  verAcciones:{
+    type:Boolean,
+    default:true
   }
 });
 </script>
