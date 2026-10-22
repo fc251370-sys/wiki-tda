@@ -5,8 +5,11 @@
       :items="items"
       :no-data-text="noData"
       hide-default-footer
-      
-    ></v-data-table>
+    >
+      <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
+        <slot :name="name" v-bind="slotProps" />
+      </template>
+    </v-data-table>
     <Pagination :total-page="totalPage" :page="page" @update:page="onPageChange"></Pagination>
   </div>
 </template>
