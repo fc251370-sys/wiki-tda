@@ -1,7 +1,22 @@
 <template>
     <div>
-        <data-table :verAcciones="acciones" :totalPage="pagination.last_page" :page="pagination.current_page" :headers="headers" :items="carreras" @viewAction="verCarrera"  @update:page="paginationMethod">
-        </data-table>
+        
+        <data-table-component :totalPage="pagination.last_page" :page="pagination.current_page" :headers="headers" :items="carreras" @viewAction="verCarrera"  @update:page="paginationMethod">
+             <template  v-slot:item.estado="{ item }">
+                <v-chip :color="item.estado ? 'success' : 'error'">
+                    {{ item.estado ? 'Activo' : 'Inactivo' }}
+                </v-chip>
+                </template>
+                <template v-slot:item.acciones="{ item }">
+                    <v-row>
+                    <v-col cols="12" col-md="4" col-sm="3" >
+                        <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verCarrera(item)"></v-btn>
+                        <v-btn v-tooltip:bottom="'Editar'"class="ml-2" density="compact" icon="mdi-pencil" v-if="item.estado"></v-btn>
+                        <v-btn v-tooltip:bottom="'Eliminar'" class="ml-2" density="compact" icon="mdi-trash-can-outline"></v-btn>
+                    </v-col>
+                    </v-row>
+                </template>
+        </data-table-component>
         <v-dialog
     v-model="dialogVerCarrera"
     
@@ -37,7 +52,7 @@
 
 <script setup>
 import {ref,onMounted} from 'vue'
-import DataTable from '../../components/DataTable.vue';
+import DataTableComponent from '../../components/DataTableComponent.vue';
 import {useCarreras} from './composable/carreraComposable'
 const acciones = ref(true);
 const dialogVerCarrera = ref(false);
