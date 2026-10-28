@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
+use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -29,4 +30,12 @@ Route::prefix('carreras')->group(function () {
     Route::get('/{id}', [CarreraController::class, 'showById']);
     Route::put('/{id}', [CarreraController::class, 'update']);
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
+});
+
+Route::prefix('categorias')->group(function () {
+    Route::get('/', [WikiCategoryController::class, 'index']);
+    Route::post('/crear', [WikiCategoryController::class, 'store']);
+    Route::get('/{id}', [WikiCategoryController::class, 'showById']);
+    Route::put('/{id}', [WikiCategoryController::class, 'update']);
+    Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
 });
