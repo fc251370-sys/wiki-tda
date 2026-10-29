@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8005\" \"php artisan queue:listen --tries=1 --timeout=0\" \"vite\" --names='server,queue,vite'",
+        "dev": "concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --port=8006\" \"php artisan queue:listen --tries=1 --timeout=0\" \"vite\" --names='server,queue,vite'",
         "setup": "composer install"
     },
     "devDependencies": {

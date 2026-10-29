@@ -51,7 +51,7 @@ Asegúrate de que los archivos `.env` estén configurados correctamente en cada 
 
 **Backend (`apps/plantilla/.env`):**
 ```env
-APP_URL=http://localhost:8005
+APP_URL=http://localhost:8006
 FRONTEND_URL=http://localhost:3005
 
 DB_CONNECTION=pgsql
@@ -64,7 +64,7 @@ DB_PASSWORD=irwin
 
 **Frontend (`apps/plantilla-front/.env`):**
 ```env
-VITE_API_URL=http://localhost:8005/api
+VITE_API_URL=http://localhost:8006/api
 ```
 
 ### 3. Levantar la infraestructura con Docker
@@ -89,7 +89,7 @@ docker exec plantilla_php php artisan migrate
 Una vez que los contenedores estén en ejecución, puedes acceder a las aplicaciones en las siguientes URLs:
 
 - **Frontend (Vue.js):** [http://localhost:3005](http://localhost:3005)
-- **Backend (Laravel API):** [http://localhost:8005](http://localhost:8005)
+- **Backend (Laravel API):** [http://localhost:8006](http://localhost:8006)
 
 ## 🏃‍♂️ Comandos Útiles (Turborepo)
 
@@ -104,7 +104,7 @@ Turborepo está configurado para ejecutar tareas en paralelo a través de los di
 El archivo `docker-compose.yml` define los siguientes servicios:
 
 - `frontend`: Contenedor Node.js sirviendo la aplicación Vue (Puerto 3005).
-- `nginx`: Servidor web para Laravel (Puerto 8005).
+- `nginx`: Servidor web para Laravel (Puerto 8006).
 - `php`: Contenedor PHP-FPM 8.4 para ejecutar el código de Laravel.
 - `pgsql`: Base de datos PostgreSQL 17 (Puerto expuesto 5437).
 - `mongodb`: Base de datos MongoDB 4.4 (Puerto expuesto 27018).
