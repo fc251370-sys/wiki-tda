@@ -15,9 +15,21 @@ export const useCarreras = ()=>{
         }
     }
 
+    //actualizar y eliminar carreras
+    const actualizarCarreras = async(id, data)=>{
+        try {
+            const status = await store.actualizarCarreras(id, data);
+            return status === 200;
+        } catch (error){
+            console.error(error);
+            return false;
+        }
+    }
+
     return {
         carreras,
         pagination, 
-        obtenerCarreras
+        obtenerCarreras,
+        actualizarCarreras,
     }
 }
