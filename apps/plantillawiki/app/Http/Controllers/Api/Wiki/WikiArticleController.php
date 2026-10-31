@@ -15,7 +15,8 @@ class WikiArticleController extends Controller
      * publicar y despublicar un articulo
      * asisiar o quitar etiquetas de un articulo
      * filtrar articulos por categoria o etiqueta
-     * 
+     * sigue este 
+     * hacer hoy si o si 
      */
 
     /**

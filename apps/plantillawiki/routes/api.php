@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
 use App\Http\Controllers\Api\Usuario\UserController;
+use App\Http\Controllers\Api\Wiki\WikiCategoryController;
+use App\Http\Controllers\Api\Wiki\WikiTagController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/refresh', [LoginController::class, 'refresh'])
@@ -36,3 +38,21 @@ Route::prefix('carreras')->group(function () {
     Route::put('/{id}', [CarreraController::class, 'update']);
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
 });
+
+Route::prefix('categorias')->group(function () {
+    Route::get('/', [WikiCategoryController::class, 'index']);
+    Route::post('/crear', [WikiCategoryController::class, 'store']);
+    Route::get('/{id}', [WikiCategoryController::class, 'showById']);
+    Route::put('/{id}', [WikiCategoryController::class, 'update']);
+    Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
+});
+
+Route::prefix('tags')->group(function () {
+    Route::get('/', [WikiTagController::class, 'index']);
+    Route::post('/crear', [WikiTagController::class, 'store']);
+    Route::get('/{id}', [WikiTagController::class, 'showById']);
+    Route::put('/{id}', [WikiTagController::class, 'update']);
+    Route::delete('/{id}', [WikiTagController::class, 'destroy']);
+});
+
+
