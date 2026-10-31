@@ -1,9 +1,10 @@
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
+import { useUserStore } from '../../../store/users/useuserStore'
 export const useUsers =  ()=>{
     const headers = ref([
         {
             title:'Nombre',
-            key:'name',
+            key:'nombre',
         },
         {
             title:'Correo electronico',
@@ -11,24 +12,25 @@ export const useUsers =  ()=>{
         },
         {
             title:'Carnet',
-            key:'carnet_or_code',
+            key:'carnet',
         },
         {
             title:'Acciones',
             key:'acciones'
         }
     ])
-    const items = ref([
-        {
-            name:'Irwin',
-            email:'irwin@yopmail.com',
-            carnet_or_code:'AA00000',
-            acciones:''
-        }
-    ])
+   
+    const store = useUserStore()
+    const usuarios = computed(()=>store.users)
+    const paginacion = computed(()=>store.paginacion)
 
+    const getUsuarios = async(page=1, params={})=>{
+        return store.getUsers(page,params)
+    }
     return {
         headers,
-        items
+        usuarios,
+        paginacion,
+        getUsuarios
     }
 }

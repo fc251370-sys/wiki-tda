@@ -34,6 +34,8 @@
       FESOL 2026
     </v-chip>
 
+    <ThemeToggle />
+
     <v-btn
       icon="mdi-bell-outline"
       variant="text"
@@ -68,6 +70,7 @@
         <v-list-item
           title="Cerrar sesión"
           prepend-icon="mdi-logout"
+          :disabled="isLoggingOut"
           @click="cerrarSesion"
         />
       </v-list>
@@ -89,9 +92,13 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { logout } from '../services/auth/login.service';
+import { useLoginStore } from '../store/auth/useLoginStore';
+import { useAlertStore } from '../store/useAlertStore';
+import ThemeToggle from './ThemeToggle.vue';
 
 const router = useRouter();
+const authStore = useLoginStore();
+const alertStore = useAlertStore();
 
 const props = defineProps({
   nameButton: {
@@ -102,6 +109,7 @@ const props = defineProps({
 const emit = defineEmits(['toggle-drawer']);
 const isAuthenticated = ref(Boolean(localStorage.getItem('token')));
 const user = ref(readStoredUser());
+const isLoggingOut = ref(false);
 
 const breadcrumbs = computed(() => {
   if (props.nameButton === 'Inicio') {
@@ -143,12 +151,24 @@ function readStoredUser() {
 }
 
 const cerrarSesion = async () => {
-  const response = await logout();
-  if (response.status) {
-    localStorage.clear();
+  if (isLoggingOut.value) {
+    return;
+  }
+
+  isLoggingOut.value = true;
+  try {
+    await authStore.logout();
+  } catch (error) {
+    console.error('No se pudo invalidar la sesión en el servidor.', error);
+    alertStore.showAlert(
+      'La sesión se cerró en este dispositivo, pero no se pudo confirmar con el servidor.',
+      'warning'
+    );
+  } finally {
     isAuthenticated.value = false;
     user.value = null;
-    router.push('/');
+    isLoggingOut.value = false;
+    await router.push('/');
   }
 };
 </script>

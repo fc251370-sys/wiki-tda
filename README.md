@@ -62,9 +62,10 @@ DB_USERNAME=postgres
 DB_PASSWORD=irwin
 ```
 
-**Frontend (`apps/plantilla-front/.env`):**
+**Frontend (`apps/plantillawiki-front/.env`):**
 ```env
-VITE_API_URL=http://localhost:8006/api
+VITE_API_URL=/api
+API_PROXY_TARGET=http://plantillawiki_nginx
 ```
 
 ### 3. Levantar la infraestructura con Docker
@@ -78,10 +79,11 @@ docker compose up -d
 
 ### 4. Ejecutar migraciones de la base de datos
 
-Una vez que los contenedores estén corriendo, ejecuta las migraciones de Laravel dentro del contenedor de PHP:
+Una vez que los contenedores estén corriendo, ejecuta las migraciones o los seeders de Laravel dentro del contenedor de PHP:
 
 ```bash
-docker exec plantilla_php php artisan migrate
+docker exec plantillawiki_php php artisan migrate
+docker exec plantillawiki_php php artisan db:seed
 ```
 
 ## 🌐 Acceso a las Aplicaciones
