@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use App\Http\Controllers\Api\Wiki\WikiTagController;
+use App\Http\Controllers\Api\Wiki\WikiArticleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -49,4 +50,7 @@ Route::prefix('tags')->group(function () {
     Route::delete('/{id}', [WikiTagController::class, 'destroy']);
 });
 
+Route::prefix('articulos')->group(function () {
+    Route::get('/', [WikiArticleController::class, 'index']);
+});
 
