@@ -7,6 +7,7 @@ use App\Models\Carrera;
 use App\Response\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CarreraController extends Controller
 {
@@ -125,18 +126,18 @@ class CarreraController extends Controller
             return ApiResponse::error($validator->errors()->first(), 422);
         }
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
             $carrera = Carrera::find($id);
             if (!$carrera) {
                 return ApiResponse::error('Carrera no encontrada', 404);
             }
 
             $carrera->update($request->all());
-            \DB::commit();
+            DB::commit();
 
             return ApiResponse::success('Carrera actualizada exitosamente', 200, $carrera);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return ApiResponse::error('Error al actualizar la carrera: ' . $e->getMessage(), 500);
         }
     }
@@ -148,10 +149,10 @@ class CarreraController extends Controller
     {
         //
         try{
-            \DB::beginTransaction();
+            DB::beginTransaction();
             $carrera = Carrera::find($id);
             $carrera->estado = !$carrera->estado;
-            \DB::commit();
+            DB::commit();
             $carrera->save();
             return ApiResponse::success('Estado del carrera actualizado correctamente',200,$carrera);
         }catch (\Exception $e) {

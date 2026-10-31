@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
+use App\Http\Controllers\Api\Wiki\WikiTagController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -39,3 +40,13 @@ Route::prefix('categorias')->group(function () {
     Route::put('/{id}', [WikiCategoryController::class, 'update']);
     Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
 });
+
+Route::prefix('tags')->group(function () {
+    Route::get('/', [WikiTagController::class, 'index']);
+    Route::post('/crear', [WikiTagController::class, 'store']);
+    Route::get('/{id}', [WikiTagController::class, 'showById']);
+    Route::put('/{id}', [WikiTagController::class, 'update']);
+    Route::delete('/{id}', [WikiTagController::class, 'destroy']);
+});
+
+
