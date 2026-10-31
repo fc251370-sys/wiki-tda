@@ -33,6 +33,7 @@ services:
     environment:
       - DB_HOST=plantillawiki_db
       - DB_PORT=5432
+      - CACHE_STORE=redis
       - MONGODB_HOST=plantillawiki_mongo
       - MONGODB_PORT=27017
       - REDIS_HOST=plantillawiki_redis

@@ -64,6 +64,7 @@
         >
           FESOL 2026
         </v-chip>
+        <ThemeToggle />
         <v-btn
           icon="mdi-bell-outline"
           variant="text"
@@ -158,8 +159,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useLogin } from './composable';
+import { useAlertStore } from '../../../store/useAlertStore';
+import ThemeToggle from '../../../components/ThemeToggle.vue';
 
 const { formulario, submit: login } = useLogin();
+const alertStore = useAlertStore();
 const form = ref(null);
 const showPassword = ref(false);
 const rememberEmail = ref(Boolean(localStorage.getItem('rememberedEmail')));
@@ -185,7 +189,14 @@ const submit = async () => {
     localStorage.removeItem('rememberedEmail');
   }
 
-  await login();
+  try {
+    await login();
+  } catch (error) {
+    alertStore.showAlert(
+      error.response?.data?.message || 'No se pudo iniciar sesión.',
+      'error'
+    );
+  }
 };
 </script>
 
@@ -394,7 +405,7 @@ const submit = async () => {
   min-height: 100vh;
   flex-direction: column;
   padding: 20px clamp(28px, 6vw, 88px) 24px;
-  background: #f7f8fa;
+  background: rgb(var(--v-theme-surface));
 }
 
 .login-topbar {
@@ -432,7 +443,7 @@ const submit = async () => {
 
 .login-heading h1 {
   margin-top: 12px;
-  color: #171a22;
+  color: rgb(var(--v-theme-on-surface));
   font-size: clamp(2rem, 3vw, 2.5rem);
   font-weight: 700;
   letter-spacing: -0.035em;
@@ -440,7 +451,7 @@ const submit = async () => {
 
 .login-heading p {
   margin-top: 8px;
-  color: #6e7480;
+  color: rgb(var(--v-theme-on-surface-variant));
   font-size: 0.98rem;
 }
 
@@ -476,7 +487,7 @@ const submit = async () => {
 
 .login-form__signup {
   margin-top: 28px;
-  color: #666d79;
+  color: rgb(var(--v-theme-on-surface-variant));
   font-size: 0.9rem;
   text-align: center;
 }
@@ -487,7 +498,7 @@ const submit = async () => {
 }
 
 .login-footer {
-  color: #8a909b;
+  color: rgb(var(--v-theme-on-surface-variant));
   font-size: 0.74rem;
   text-align: center;
 }

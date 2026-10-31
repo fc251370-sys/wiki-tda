@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Response\ApiResponse;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class LoginController extends Controller
 {
@@ -45,11 +46,12 @@ class LoginController extends Controller
     public function logout(){
         try {
             auth('api')->logout();
-           return ApiResponse::success("Sesión cerrada");
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al desconectarse',
-            ], 500);
+            return ApiResponse::success('Sesión cerrada');
+        } catch (JWTException $e) {
+            return ApiResponse::error('La sesión no pudo invalidarse', 401);
+        } catch (\Throwable $e) {
+            report($e);
+            return ApiResponse::error('Error al cerrar sesión', 500);
         }
     }
 
@@ -60,19 +62,26 @@ class LoginController extends Controller
     public function refresh()
     {
         try {
-            $token = auth('api')->refresh();
-            $user = auth('api')->user();
+            $guard = auth('api');
+            $token = $guard->refresh();
+            $user = $guard->setToken($token)->user();
+
+            if (! $user) {
+                return ApiResponse::error('La sesión ya no es válida', 401);
+            }
+
             $user->unsetRelation('roles');
             $user->unsetRelation('permissions');
 
-            return response()->json([
+            return ApiResponse::success('Token actualizado', 200, [
                 'token' => $token,
                 'user' => $user,
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al refrescar el token',
-            ], 500);
+        } catch (JWTException $e) {
+            return ApiResponse::error('La sesión expiró. Inicia sesión nuevamente.', 401);
+        } catch (\Throwable $e) {
+            report($e);
+            return ApiResponse::error('Error al renovar la sesión', 500);
         }
     }
 
