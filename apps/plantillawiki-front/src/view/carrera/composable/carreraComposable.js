@@ -26,10 +26,21 @@ export const useCarreras = ()=>{
         }
     }
 
+    const eliminarCarreras = async(id)=>{
+        try {
+            const status = await store.eliminarCarreras(id);
+            return status === 200;
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
     return {
         carreras,
         pagination, 
         obtenerCarreras,
         actualizarCarreras,
+        eliminarCarreras,
     }
 }

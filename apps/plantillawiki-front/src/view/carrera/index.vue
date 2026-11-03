@@ -1,6 +1,13 @@
 <template>
     <div>
-        
+        <!-- buscar carrera seguir despues-->
+        <title-component :title="'Listado de carreras'"></title-component>
+        <v-row class="d-flex justify-end">
+            <v-col cols="12" md="4" >
+                <v-text-field variant="outlined" clearable density="compact" rounded-xl append-inner-icon="mdi-magnify" @input="buscarcarreras"></v-text-field>
+            </v-col>
+            
+        </v-row>
         <data-table-component :totalPage="pagination.last_page" :page="pagination.current_page" :headers="headers" :items="carreras" @viewAction="verCarrera"  @update:page="paginationMethod">
             <template  v-slot:item.estado="{ item }">
                 <v-chip :color="item.estado ? 'success' : 'error'">
@@ -17,7 +24,7 @@
                         <v-btn v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" v-if="item.estado" @click="ActualizarCarrera(item)"></v-btn>
                         
                         <!-- ELIMINAR PENDIENTE -->
-                        <v-btn v-tooltip:bottom="'Eliminar'" class="ml-2" density="compact" icon="mdi-trash-can-outline" @click="eliminarCarrera(item)"></v-btn>
+                        <v-btn v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
     
                     </v-col>
                     </v-row>
@@ -84,6 +91,7 @@
 import {ref,onMounted} from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import {useCarreras} from './composable/carreraComposable'
+import { eliminarcarreras } from '../../services/carrera/carrera.service.js';
 const acciones = ref(true);
 
 const dialogVerCarrera = ref(false);
@@ -99,7 +107,7 @@ const guardando = ref(false)
 
 //agragdo
 const carrera = ref(null);
-const {carreras, pagination,obtenerCarreras, actualizarCarreras} = useCarreras();
+const {carreras, pagination,obtenerCarreras, actualizarCarreras, eliminarCarreras} = useCarreras();
 const headers = ref([
         { title: 'Name', key: 'name' },
         { title: 'Code', key: 'code' },
@@ -138,7 +146,19 @@ const guardarEdicion = async() =>{
         await obtenerCarreras();
     }
 }
+//elimnar carrera cambiar estado activo incactivo
+const cambiarEstado = async(item) =>{
+    const ok = await eliminarcarreras(item.id,);
+    if (ok){
+        await obtenerCarreras();
+    }
+}
 
+//buscar carreras seguir despues
+const buscarcarreras= (e)=>{
+    console.log(e.target.value);
+    
+}
 
 onMounted(async()=>{
     await obtenerCarreras();

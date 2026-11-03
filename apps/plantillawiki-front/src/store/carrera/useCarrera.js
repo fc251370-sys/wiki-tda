@@ -33,6 +33,17 @@ export const useCarreraStore = defineStore('carreras',{
                 console.log(error);
             }
         },
+
+        async eliminarCarreras(is){
+            try {
+                const response = await eliminarcarreras(id);
+                console.log(response);
+
+                return response.status
+            } catch(error){
+                console.log(error);
+            }
+        }
     },
     
 })
