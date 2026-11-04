@@ -9,9 +9,9 @@ export const useCarreraStore = defineStore('carreras',{
         pagination:{},
     }),
     actions:{
-        async getCarreras(){
+        async getCarreras(params = {}){
             try {
-                const response = await carreras();
+                const response = await carreras(params);
                 console.log(response);
                 
                 this.carreras = response.data.data;

@@ -5,9 +5,9 @@ export const useCarreras = ()=>{
     const carreras = computed(()=>store.carreras)
     const pagination = computed(()=>store.pagination)
 
-    const obtenerCarreras = async()=>{
+    const obtenerCarreras = async(page = 1, filtros = {})=>{
         try {
-        const response = await store.getCarreras();
+        const response = await store.getCarreras({page, ...filtros});
             console.log(response);
             
         } catch (error) {

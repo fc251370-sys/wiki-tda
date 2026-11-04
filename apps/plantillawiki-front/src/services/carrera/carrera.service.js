@@ -1,5 +1,5 @@
 import api from '../../utils/axios'
-const carreras = async()=> await api.get('carreras')
+const carreras = async(params = {})=> await api.get('carreras', {params})
 const actualizarcarreras = async (id, data) => await api.put(`carreras/${id}`, data)
 const eliminarcarreras = async (id) => await api.delete(`carreras/${id}`)
 

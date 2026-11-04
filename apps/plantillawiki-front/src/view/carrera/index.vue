@@ -4,7 +4,7 @@
         <title-component :title="'Listado de carreras'"></title-component>
         <v-row class="d-flex justify-end">
             <v-col cols="12" md="4" >
-                <v-text-field variant="outlined" clearable density="compact" rounded-xl append-inner-icon="mdi-magnify" @input="buscarcarreras"></v-text-field>
+                <v-text-field v-model="search" variant="outlined" clearable density="compact" rounded-xl append-inner-icon="mdi-magnify" @input="obtenerCarreras"></v-text-field>
             </v-col>
             
         </v-row>
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import {ref,onMounted} from 'vue'
+import {ref,onMounted,watch,onBeforeUnmount} from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import {useCarreras} from './composable/carreraComposable'
 import { eliminarcarreras } from '../../services/carrera/carrera.service.js';
@@ -102,8 +102,23 @@ const dialogActualizarCarrera = ref(false);
 const form = ref({id:null, name:'', code:''});
 const formEditar = ref(null);
 const guardando = ref(false)
+//agregado para buscar carreras
+const search = ref('')
+let searchTimeout
+const filtros = () => ({name: search.value?.trim() || undefined})
 
+const paginationMethod = async(page) => {
+    await obtenerCarreras(page, filtros())
+}
 
+watch(search, (value) => {
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+        obtenerCarreras(1, filtros())
+    }, 300)
+})
+
+onBeforeUnmount(() => clearTimeout(searchTimeout))
 
 //agragdo
 const carrera = ref(null);
