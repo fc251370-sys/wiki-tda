@@ -36,11 +36,23 @@ export const useCarreras = ()=>{
         }
     }
 
+    //crear carreras
+    const crearCarreras = async(data)=>{
+        try {
+            const status = await store.crearCarreras(data);
+            return status === 201;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
     return {
         carreras,
         pagination, 
         obtenerCarreras,
         actualizarCarreras,
         eliminarCarreras,
+        crearCarreras,
     }
 }

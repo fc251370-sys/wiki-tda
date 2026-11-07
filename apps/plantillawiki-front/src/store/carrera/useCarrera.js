@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 //importamos
-import { carreras, actualizarcarreras } from '../../services/carrera/carrera.service.js'
+import { carreras, actualizarcarreras, eliminarcarreras,crearcarreras } from '../../services/carrera/carrera.service.js'
 
 
 export const useCarreraStore = defineStore('carreras',{
@@ -14,8 +14,8 @@ export const useCarreraStore = defineStore('carreras',{
                 const response = await carreras(params);
                 console.log(response);
                 
-                this.carreras = response.data.data;
-                this.pagination = response.data.pagination;
+                this.carreras = response.data.data ?? [];
+                this.pagination = response.data.pagination ?? {};
                 return response.status;
             } catch (error) {
                 console.log(error);
@@ -34,7 +34,7 @@ export const useCarreraStore = defineStore('carreras',{
             }
         },
 
-        async eliminarCarreras(is){
+        async eliminarCarreras(id){
             try {
                 const response = await eliminarcarreras(id);
                 console.log(response);
@@ -43,7 +43,16 @@ export const useCarreraStore = defineStore('carreras',{
             } catch(error){
                 console.log(error);
             }
-        }
-    },
-    
-})
+        },
+
+        async crearCarreras(data){
+            try {
+                const response = await crearcarreras(data);
+                return response.status
+            } catch (error) {
+                console.log(error);
+                return null;
+            }
+        },
+    }
+})  
