@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\WikiArticle;
 use App\Response\ApiResponse;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+
 
 class WikiArticleController extends Controller
 {
@@ -22,6 +24,7 @@ class WikiArticleController extends Controller
      * filtrar por categoría, tag, título, publicado o estado
      * "eliminar" solo alterna el estado
      */
+
 
     public function index(Request $request)
     {
