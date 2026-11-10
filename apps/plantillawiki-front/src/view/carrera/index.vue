@@ -4,12 +4,19 @@
         <title-component :title="'Listado de carreras'"></title-component>
         <v-row class="d-flex justify-end">
             <v-col cols="12" md="4" >
-                <v-text-field v-model="search" variant="outlined" clearable density="compact" rounded-xl append-inner-icon="mdi-magnify" @input="obtenerCarreras"></v-text-field>
+                <v-text-field v-model="search" variant="outlined" clearable density="compact" rounded-xl append-inner-icon="mdi-magnify"></v-text-field>
             </v-col>
         </v-row>
         <v-row>
             <v-col>
                 <v-btn v-tooltip:bottom="'Nueva Carrera'" color="primary" icon="mdi-plus" @click="abrirCrear" ></v-btn>
+            </v-col>
+            <v-col cols="auto">
+                <v-btn-toggle v-model="estadoFiltro" mandatory color="primary" density="compact" divided>
+                    <v-btn value="todas">Todas</v-btn>
+                    <v-btn value="activas">Activas</v-btn>
+                    <v-btn value="inactivas">Inactivas</v-btn>
+                </v-btn-toggle>
             </v-col>
         </v-row>
         
@@ -118,7 +125,6 @@ import {ref,onMounted,watch,onBeforeUnmount} from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import {useCarreras} from './composable/carreraComposable'
 import TitleComponent from '../../components/TitleComponent.vue';
-import { eliminarcarreras } from '../../services/carrera/carrera.service.js';
 const acciones = ref(true);
 
 // crear carrers
@@ -138,7 +144,17 @@ const guardando = ref(false)
 //agregado para buscar carreras
 const search = ref('')
 let searchTimeout
-const filtros = () => ({name: search.value?.trim() || undefined})
+
+//filtro para elejir que ver 
+const estadoFiltro = ref('todas');
+const filtros = () => ({
+    name: search.value?.trim() || undefined,
+    estado: estadoFiltro.value === 'todas' ? undefined : estadoFiltro.value === 'activas'
+})
+
+watch(estadoFiltro, async() => {
+    await obtenerCarreras(1, filtros())
+})
 
 const paginationMethod = async(page) => {
     await obtenerCarreras(page, filtros())
@@ -191,14 +207,14 @@ const guardarEdicion = async() =>{
 
     if (ok) {
         dialogActualizarCarrera.value = false;
-        await obtenerCarreras();
+        await obtenerCarreras(1, filtros());
     }
 }
 //elimnar carrera cambiar estado activo incactivo
 const cambiarEstado = async(item) =>{
     const ok = await eliminarCarreras(item.id,);
     if (ok){
-        await obtenerCarreras();
+        await obtenerCarreras(1, filtros());
     }
 }
 
@@ -221,15 +237,10 @@ const guardarNueva = async() =>{
 
     if(ok) {
         dialogCrearCarrera.value =false;
-        await obtenerCarreras()
+        await obtenerCarreras(1, filtros());
     }
 }
 
-//buscar carreras seguir despues
-const buscarcarreras= (e)=>{
-    console.log(e.target.value);
-    
-}
 
 onMounted(async()=>{
     await obtenerCarreras();
