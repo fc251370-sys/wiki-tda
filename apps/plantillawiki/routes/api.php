@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
+use App\Http\Controllers\Api\Evento\EventController;
 use App\Http\Controllers\Api\Usuario\UserController;
+use App\Http\Controllers\Api\Evento\EventSubjectController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use App\Http\Controllers\Api\Wiki\WikiTagController;
 use App\Http\Controllers\Api\Wiki\WikiArticleController;
@@ -43,6 +45,25 @@ Route::prefix('carreras')->group(function () {
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
 });
 
+Route::prefix('eventos')->group(function () {
+    Route::get('/', [EventController::class, 'index']);
+    Route::post('/crear', [EventController::class, 'store']);
+    Route::get('/activo', [EventController::class, 'active']);
+    Route::get('/{id}', [EventController::class, 'showById']);
+    Route::put('/{id}', [EventController::class, 'update']);
+    Route::delete('/{id}', [EventController::class, 'destroy']);
+    Route::patch('/{id}/activar', [EventController::class, 'toggleActive']);
+
+    Route::prefix('/{eventId}/materias')->group(function () {
+        Route::get('/', [EventSubjectController::class, 'index']);
+        Route::post('/crear', [EventSubjectController::class, 'store']);
+        Route::get('/{id}', [EventSubjectController::class, 'showById']);
+        Route::put('/{id}', [EventSubjectController::class, 'update']);
+        Route::delete('/{id}', [EventSubjectController::class, 'destroy']);
+        Route::get('/{id}/proyectos', [EventSubjectController::class, 'projects']);
+    });
+});
+
 Route::prefix('categorias')->group(function () {
     Route::get('/', [WikiCategoryController::class, 'index']);
     Route::post('/crear', [WikiCategoryController::class, 'store']);
@@ -65,4 +86,5 @@ Route::prefix('articulos')->group(function () {
     Route::get('/{id}', [WikiArticleController::class, 'showById']);
     Route::put('/{id}', [WikiArticleController::class, 'update']);
     Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
+
 });
