@@ -1,7 +1,7 @@
 <template>
     <v-row>
-        <v-col color="primary" class="d-flex justify-center font-weight-black">
-            <p >
+        <v-col  class="d-flex justify-center font-weight-black">
+            <p class="text-primary">
                 {{ title }}
             </p>
         </v-col>
@@ -17,7 +17,5 @@ const props = defineProps({
 })
 </script>
 <style scoped>
-p{
-    color: #0D1239;
-}
+
 </style>

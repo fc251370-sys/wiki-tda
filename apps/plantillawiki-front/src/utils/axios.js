@@ -3,15 +3,53 @@
 import axios from "axios";
 import { useAlertStore } from "../store/useAlertStore";
 import { useLoadingStore } from "../store/useLoadingStore";
+import { clearAuthSession } from "./authSession";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8006/api",
+  baseURL: import.meta.env.VITE_API_URL || "/api",
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
+
+let refreshPromise;
+let sessionExpiredRedirecting = false;
+
+const isAuthEndpoint = (url = "") =>
+  /(?:^|\/)auth\/(?:login|refresh)(?:[?#]|$)/.test(url);
+const isHandledAuthRequest = (url = "") =>
+  /(?:^|\/)auth\/(?:login|logout)(?:[?#]|$)/.test(url);
+
+async function refreshAccessToken() {
+  const response = await api.post("auth/refresh");
+  const token = response.data?.data?.token ?? response.data?.token;
+
+  if (!token) {
+    throw new Error("La respuesta de refresh no contiene un token.");
+  }
+
+  localStorage.setItem("token", token);
+  sessionExpiredRedirecting = false;
+  return token;
+}
+
+function handleExpiredSession() {
+  clearAuthSession();
+
+  if (!sessionExpiredRedirecting) {
+    sessionExpiredRedirecting = true;
+    useAlertStore().showAlert(
+      "Tu sesión expiró. Inicia sesión nuevamente.",
+      "warning"
+    );
+
+    if (window.location.pathname !== "/login") {
+      window.location.assign("/login");
+    }
+  }
+}
 
 /**
  * Interceptor de solicitudes
@@ -46,7 +84,7 @@ api.interceptors.response.use(
     return response;
   },
 
-  (error) => {
+  async (error) => {
     if (error.config?._globalLoaderTracked) {
       error.config._globalLoaderTracked = false;
       useLoadingStore().finishLoading();
@@ -54,9 +92,50 @@ api.interceptors.response.use(
 
     const alertStore = useAlertStore();
 
+    const requestUrl = error.config?.url ?? "";
     if (!error.response) {
+      if (isHandledAuthRequest(requestUrl)) {
+        return Promise.reject(error);
+      }
+
       console.error("Error de conexión con el servidor.");
       alertStore.showAlert("Error de conexión con el servidor.", "error");
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401) {
+      if (isAuthEndpoint(requestUrl)) {
+        return Promise.reject(error);
+      }
+
+      if (isHandledAuthRequest(requestUrl)) {
+        return Promise.reject(error);
+      }
+
+      if (error.config && !error.config._retry && localStorage.getItem("token")) {
+        error.config._retry = true;
+
+        try {
+          refreshPromise ??= refreshAccessToken();
+          const token = await refreshPromise;
+          error.config.headers.Authorization = `Bearer ${token}`;
+          return api(error.config);
+        } catch (refreshError) {
+          if (refreshError.response?.status === 401) {
+            handleExpiredSession();
+          }
+          return Promise.reject(refreshError);
+        } finally {
+          refreshPromise = undefined;
+        }
+      }
+
+      if (localStorage.getItem("token")) {
+        handleExpiredSession();
+      } else {
+        alertStore.showAlert("Debes iniciar sesión para continuar.", "warning");
+      }
+
       return Promise.reject(error);
     }
 
@@ -64,16 +143,6 @@ api.interceptors.response.use(
       case 400:
         console.error("Solicitud incorrecta.");
         alertStore.showAlert("Solicitud incorrecta.", "error");
-        break;
-
-      case 401:
-        console.error("Sesión expirada.");
-        alertStore.showAlert("Sesión expirada. Por favor, inicia sesión nuevamente.", "warning");
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-
-        window.location.href = "/login";
         break;
 
       case 403:
