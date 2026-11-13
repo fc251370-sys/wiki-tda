@@ -27,7 +27,7 @@ class WikiTagController extends Controller
     {
         //
         try {
-            $tags = wikiTag::withCount('articles');
+            $tags = WikiTag::withCount('articles');
 
             if ($request->has('name')) {
                 $tags->where('name', 'ilike', '%' . $request->name . '%');
@@ -72,6 +72,9 @@ class WikiTagController extends Controller
                 'name.string' => 'El nombre solo debe tener texto',
                 'name.min' => 'El nombre debe tener al menos 2 caracteres',
                 'name.max' => 'Ya existe un tag con ese nombre',
+                'slug.unique' => 'Ya existe un tag con ese slug',
+                'name.max' => 'El nombre no debe superar los 50 caracteres',
+                'slug.max' => 'El slug no debe superar los 60 caracteres',
             ];
 
             $data = $request->all();
@@ -136,6 +139,7 @@ class WikiTagController extends Controller
                 'name.min' => 'El nombre debe tener al menos 2 caracteres',
                 'name.max' => 'El nombre no debe superar los 50 caracteres',
                 'slug.unique' => 'Ya exixte un tag con ese nombre',
+                'slug.max' => 'El slug no debe superar los 60 caracteres',
             ];
 
             $data = $request->all();
