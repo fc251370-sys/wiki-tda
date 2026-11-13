@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RolesController;
 use App\Http\Controllers\Api\Carrera\CarreraController;
+use App\Http\Controllers\Api\Evento\EventController;
 use App\Http\Controllers\Api\Usuario\UserController;
+use App\Http\Controllers\Api\Evento\EventSubjectController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use App\Http\Controllers\Api\Wiki\WikiTagController;
 use App\Http\Controllers\Api\Wiki\WikiArticleController;
@@ -42,8 +44,8 @@ Route::prefix('carreras')->middleware('auth:api')->group(function () {
     Route::put('/{id}', [CarreraController::class, 'update']);
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
 });
-//lado de la wiki
-Route::prefix('categorias')->middleware('auth:api')->group(function () {
+
+Route::prefix('categorias')->group(function () {
     Route::get('/', [WikiCategoryController::class, 'index']);
     Route::post('/crear', [WikiCategoryController::class, 'store']);
     Route::get('/{id}', [WikiCategoryController::class, 'showById']);
@@ -65,5 +67,6 @@ Route::prefix('articulos')->middleware('auth:api')->group(function () {
     Route::get('/{id}', [WikiArticleController::class, 'showById']);
     Route::put('/{id}', [WikiArticleController::class, 'update']);
     Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
+
 });
 //hasta aca es la parte de la wiki
