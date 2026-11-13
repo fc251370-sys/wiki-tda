@@ -37,12 +37,31 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::prefix('carreras')->middleware('auth:api')->group(function () {
+Route::prefix('carreras')->group(function () {
     Route::get('/', [CarreraController::class, 'index']);
     Route::post('/crear', [CarreraController::class, 'store']);
     Route::get('/{id}', [CarreraController::class, 'showById']);
     Route::put('/{id}', [CarreraController::class, 'update']);
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
+});
+
+Route::prefix('eventos')->group(function () {
+    Route::get('/', [EventController::class, 'index']);
+    Route::post('/crear', [EventController::class, 'store']);
+    Route::get('/activo', [EventController::class, 'active']);
+    Route::get('/{id}', [EventController::class, 'showById']);
+    Route::put('/{id}', [EventController::class, 'update']);
+    Route::delete('/{id}', [EventController::class, 'destroy']);
+    Route::patch('/{id}/activar', [EventController::class, 'toggleActive']);
+
+    Route::prefix('/{eventId}/materias')->group(function () {
+        Route::get('/', [EventSubjectController::class, 'index']);
+        Route::post('/crear', [EventSubjectController::class, 'store']);
+        Route::get('/{id}', [EventSubjectController::class, 'showById']);
+        Route::put('/{id}', [EventSubjectController::class, 'update']);
+        Route::delete('/{id}', [EventSubjectController::class, 'destroy']);
+        Route::get('/{id}/proyectos', [EventSubjectController::class, 'projects']);
+    });
 });
 
 Route::prefix('categorias')->group(function () {
@@ -53,7 +72,7 @@ Route::prefix('categorias')->group(function () {
     Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
 });
 
-Route::prefix('tags')->middleware('auth:api')->group(function () {
+Route::prefix('tags')->group(function () {
     Route::get('/', [WikiTagController::class, 'index']);
     Route::post('/crear', [WikiTagController::class, 'store']);
     Route::get('/{id}', [WikiTagController::class, 'showById']);
@@ -61,7 +80,7 @@ Route::prefix('tags')->middleware('auth:api')->group(function () {
     Route::delete('/{id}', [WikiTagController::class, 'destroy']);
 });
 
-Route::prefix('articulos')->middleware('auth:api')->group(function () {
+Route::prefix('articulos')->group(function () {
     Route::get('/', [WikiArticleController::class, 'index']);
     Route::post('/crear', [WikiArticleController::class, 'store']);
     Route::get('/{id}', [WikiArticleController::class, 'showById']);
@@ -69,4 +88,3 @@ Route::prefix('articulos')->middleware('auth:api')->group(function () {
     Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
 
 });
-//hasta aca es la parte de la wiki
