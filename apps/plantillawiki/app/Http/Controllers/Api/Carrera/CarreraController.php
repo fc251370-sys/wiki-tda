@@ -31,6 +31,9 @@ class CarreraController extends Controller
                 if($request->has('name')){
                 $carreras->where('name','ilike','%'.$request->name.'%');
             }
+            if($request->has('estado')){
+                $carreras->where('estado',$request->boolean('estado'));
+            }
             
             $carrerasPaginated = $carreras->paginate(10);
 

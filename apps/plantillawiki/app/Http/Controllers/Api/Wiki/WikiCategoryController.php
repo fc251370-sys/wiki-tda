@@ -51,6 +51,7 @@ class WikiCategoryController extends Controller
                 'name' => $categoria->name,
                 'slug' => $categoria->slug,
                 'description' => $categoria->description,
+                'estado' => $categoria->estado,
                 'articles_count' => $categoria->articles_count,
             ];
 
