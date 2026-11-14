@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\Evento\EventSubjectController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use App\Http\Controllers\Api\Wiki\WikiTagController;
 use App\Http\Controllers\Api\Wiki\WikiArticleController;
+use App\Http\Controllers\Api\Proyecto\ProjectController;
+use App\Http\Controllers\Api\Proyecto\ProjectFileController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/refresh', [LoginController::class, 'refresh'])
@@ -87,4 +89,18 @@ Route::prefix('articulos')->group(function () {
     Route::put('/{id}', [WikiArticleController::class, 'update']);
     Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
 
+});
+
+Route::prefix('proyectos')->group(function () {
+    Route::get('/', [ProjectController::class, 'index']);
+    Route::post('/crear', [ProjectController::class, 'store']);
+    Route::get('/{id}', [ProjectController::class, 'show']);
+    Route::put('/{id}', [ProjectController::class, 'update']);
+    Route::delete('/{id}', [ProjectController::class, 'destroy']);
+
+    Route::get('/{projectId}/archivos', [ProjectFileController::class, 'index']);
+    Route::post('/{projectId}/archivos', [ProjectFileController::class, 'store']);
+    Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);
+    Route::put('/archivos/{id}', [ProjectFileController::class, 'update']);
+    Route::delete('/archivos/{id}', [ProjectFileController::class, 'destroy']);
 });
