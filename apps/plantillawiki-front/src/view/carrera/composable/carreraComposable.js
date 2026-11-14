@@ -5,9 +5,9 @@ export const useCarreras = ()=>{
     const carreras = computed(()=>store.carreras)
     const pagination = computed(()=>store.pagination)
 
-    const obtenerCarreras = async()=>{
+    const obtenerCarreras = async(page = 1, filtros = {})=>{
         try {
-        const response = await store.getCarreras();
+        const response = await store.getCarreras({page, ...filtros});
             console.log(response);
             
         } catch (error) {
@@ -26,10 +26,33 @@ export const useCarreras = ()=>{
         }
     }
 
+    const eliminarCarreras = async(id)=>{
+        try {
+            const status = await store.eliminarCarreras(id);
+            return status === 200;
+        } catch (error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    //crear carreras
+    const crearCarreras = async(data)=>{
+        try {
+            const status = await store.crearCarreras(data);
+            return status === 201;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
     return {
         carreras,
         pagination, 
         obtenerCarreras,
         actualizarCarreras,
+        eliminarCarreras,
+        crearCarreras,
     }
 }

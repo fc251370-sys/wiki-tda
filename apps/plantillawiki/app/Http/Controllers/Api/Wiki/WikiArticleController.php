@@ -64,17 +64,18 @@ class WikiArticleController extends Controller
                     'title' => $articulo->title,
                     'slug' => $articulo->slug,
                     'is_published' => $articulo->is_published,
+                    'content' => $articulo->content, 
                     'estado' => $articulo->estado,
                     'category' => [
-                        'id' => $articulo->category->id,
-                        'name' => $articulo->name,
+                        'id' => $articulo->category?->id,
+                        'name' => $articulo->category?->name,
                     ],
                     'author' => [
-                        'id' => $articulo->author->id,
-                        'name' => $articulo->author->name,
+                        'id' => $articulo->author?->id,
+                        'name' => $articulo->author?->name,
                     ],
                     'tags' => $articulo->tags->map(fn($tag) => [
-                        'id' => $tag->author->id,
+                        'id' => $tag->id,
                         'name' => $tag->name,
                     ]),
                 ];
@@ -93,21 +94,57 @@ class WikiArticleController extends Controller
     {
         try {
             $messages = [
-                'title.required' => 'El titulo es requerido',
+                'title.required'       => 'El título es requerido',
+                'title.string'         => 'El título solo debe tener texto',
+                'content.required'     => 'El contenido es requerido',
+                'category_id.required' => 'La categoría es requerida',
+                'category_id.exists'   => 'La categoría no existe o está inactiva',
+                'tags.array'           => 'Los tags deben enviarse como lista',
+                'tags.*.exists'        => 'Algún tag no existe o está inactivo',
             ];
 
-            $validator = Validator::make($request->all(), [
+            $validator = Validator::make($request->all(),[
                 'title' => 'required|string|min:3|max:255',
                 'content' => 'required|string',
-                //solo categorias y tags activos 
-                'categoy_id' => []
-            ], $messages);
+                // "Rule" vailda que la categoria exista y que ademas este activa 
+                'category_id' => ['required', Rule::exists('wiki_categories', 'id')->where('estado', true)],
+                'is_published' => 'sometimes|boolean',
+                'tags'=> 'sometimes|array',
+                //lo mismo que la categoria, ve que exista y que este activa y "tags.*" aplica la regla a cada elemento del array
+                'tags.*' => [Rule::exists('wiki_tags', 'id')->where('estado', true)],
+            ],$messages);   
 
-            if ($validator->fails()) {
-                return ApiResponse::error($validator->errors()->first(), 422);
+            if($validator->fails()){
+                return ApiResponse::error($validator->errors()->first(),422);
             }
+
+            //creacion de el articulo y ver que no exista otro con el mismo slug, 
+            //si existe se le agrega un sufijo aleatorio
+
+            $slug = Str::slug($request->title);
+            $existe = WikiArticle::where('slug', $slug)->exists();
+
+            if ($existe) {
+                $slug .= '-' . Str::random(6);
+            }
+
+            $articulo = WikiArticle::create([
+                'category_id'  => $request->category_id,
+                'author_id'    => $request->user()->id,
+                'title'        => $request->title,
+                'slug'         => $slug,
+                'content'      => $request->content,
+                'is_published' => $request->boolean('is_published'),
+            ]);
+
+            //asignar tags si vienen 
+            if($request->has('tags')){
+                $articulo->tags()->sync($request->tags);
+            }
+
+            return ApiResponse::success('Articulo creado de forma correcta',201);
         } catch (\Exception $e) {
-            return ApiResponse::error('Error al crear el artículo', 500);
+            return ApiResponse::error('Error al crear el artículo', 500, $e->getMessage());
         }
     }
 
