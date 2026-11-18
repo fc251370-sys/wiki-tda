@@ -1,11 +1,11 @@
 <template>
   <div>
-    <!-- Botón para volver a las cards de wiki -->
+    <!-- boton volver-->
     <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/wiki')">
     Volver
     </v-btn>
 
-    <!-- Buscador de artículos -->
+    <!-- buscador -->
     <v-row class="d-flex justify-end">
       <v-col cols="12" md="4">
         <v-text-field
@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
 
-    <!-- Botón nuevo + filtro de estado -->
+    <!-- botón nuevo articulo -->
     <v-row>
       <v-col>
         <v-btn
@@ -38,7 +38,7 @@
       </v-col>
     </v-row>
 
-    <!-- Tabla de artículos -->
+    <!-- Tabla de articulos -->
     <data-table-component
       :key="tablaKey"
       :totalPage="pagination?.last_page"
@@ -47,14 +47,14 @@
       :items="articulos"
       @update:page="paginationMethod"
     >
-      <!-- Chip de estado -->
+      <!-- estado -->
       <template v-slot:item.estado="{ item }">
         <v-chip :color="item.estado ? 'success' : 'error'">
           {{ item.estado ? 'Activo' : 'Inactivo' }}
         </v-chip>
       </template>
 
-      <!-- Chip de publicado -->
+      <!-- publicado -->
       <template v-slot:item.is_published="{ item }">
         <v-btn
           size="small"
@@ -67,7 +67,7 @@
         </v-btn>
       </template>
 
-      <!-- Botones de acción -->
+      <!-- botones de accion -->
       <template v-slot:item.acciones="{ item }">
         <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verArticulo(item)" />
         <v-btn
@@ -114,7 +114,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo editar artículo -->
+    <!-- editar articulo -->
     <v-dialog v-model="dialogActualizarArticulo" max-width="600" persistent>
       <v-card>
         <v-card-title>Editar artículo</v-card-title>
@@ -153,7 +153,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo crear artículo -->
+    <!-- crear articulo -->
     <v-dialog v-model="dialogCrearArticulo" max-width="600" persistent>
       <v-card>
         <v-card-title>Crear artículo</v-card-title>
@@ -198,15 +198,10 @@
 </template>
 
 <script setup>
-// Hooks de Vue
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
-// Tabla reutilizable
 import DataTableComponent from '../../../components/DataTableComponent.vue'
-// Composable de artículos
 import { useArticulos } from './composable/articuloComposable.js'
-// Composable de categorías (para el select)
 import { useCategorias } from '../../wikiconf/categoria/composable/categoriaComposable.js'
-// Composable de tags (para el select)
 import { useTags } from '../../wikiconf/tag/composable/tagComposable.js'
 
 // Crear
@@ -377,7 +372,6 @@ const cambiarPublicado = async (item) => {
   }
 }
 
-// Carga inicial
 // Carga inicial: artículos + categorías + tags para los selects
 onMounted(async () => {
   await Promise.all([
@@ -386,7 +380,5 @@ onMounted(async () => {
     obtenerTags(1, { estado: true }),         // solo activas
   ])
 })
-
-
 
 </script>
