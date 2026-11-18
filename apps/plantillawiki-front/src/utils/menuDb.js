@@ -64,9 +64,16 @@ export const menuItems = [
             {
                 title: 'Configuración',
                 icon: 'mdi-cog-outline',
-                to: '/admin/configuracion',
+                to: '/admin/configuracion', 
                 requiresAuth: true,
                 roles: ['admin'],
+            },
+            {
+                title: 'Wiki Configurciones',
+                icon: 'mdi-book-open-page-variant-outline',
+                to: '/admin/wikiconf',
+                requiresAuth: true,
+                roles: ['admin', 'coordinador'],
             },
         ],
     },

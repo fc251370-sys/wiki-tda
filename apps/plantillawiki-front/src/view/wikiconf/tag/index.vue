@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Botón para volver a las cards de wiki -->
-    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/admin/wiki')">
+    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/admin/wikiconf')">
     Volver
     </v-btn>
 

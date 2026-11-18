@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Botón para volver a las cards de wiki -->
-    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/admin/wiki')">
+    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/wiki')">
     Volver
     </v-btn>
 
@@ -205,9 +205,9 @@ import DataTableComponent from '../../../components/DataTableComponent.vue'
 // Composable de artículos
 import { useArticulos } from './composable/articuloComposable.js'
 // Composable de categorías (para el select)
-import { useCategorias } from '../categoria/composable/categoriaComposable.js'
+import { useCategorias } from '../../wikiconf/categoria/composable/categoriaComposable.js'
 // Composable de tags (para el select)
-import { useTags } from '../tag/composable/tagComposable.js'
+import { useTags } from '../../wikiconf/tag/composable/tagComposable.js'
 
 // Crear
 const dialogCrearArticulo = ref(false)
@@ -277,6 +277,7 @@ watch(search, () => {
 
 //funcion de recarga de articulos
 const recargar = async () => {
+//pide la lista y la guarda y vuelve a crear la lista, este key esta tambien en la tabla
   await obtenerArticulos(1, filtros())
   tablaKey.value++
 }
