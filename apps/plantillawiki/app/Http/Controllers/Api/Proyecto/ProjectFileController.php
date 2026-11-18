@@ -37,7 +37,6 @@ class ProjectFileController extends Controller
                 200,
                 $archivos
             );
-
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al obtener los archivos',
@@ -104,7 +103,6 @@ class ProjectFileController extends Controller
                 201,
                 $archivoGuardado
             );
-
         } catch (\Exception $e) {
             // Si ocurre un error, elimina el archivo que se alcanzó a guardar
             if ($ruta) {
@@ -139,7 +137,6 @@ class ProjectFileController extends Controller
                 $archivo->file_path,
                 $archivo->original_name
             );
-
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al descargar el archivo',
@@ -207,7 +204,6 @@ class ProjectFileController extends Controller
                 200,
                 $archivoGuardado
             );
-
         } catch (\Exception $e) {
             // Si falla la actualización, elimina el archivo nuevo
             if ($rutaNueva) {
@@ -242,7 +238,6 @@ class ProjectFileController extends Controller
                 200,
                 $archivo
             );
-
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al eliminar el archivo',

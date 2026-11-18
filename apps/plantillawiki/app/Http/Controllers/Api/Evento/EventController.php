@@ -88,7 +88,7 @@ class EventController extends Controller
                 'coordinador_id' => 'required|integer|exists:users,id',
                 'cicle_name' => 'required|string|min:3|max:50|unique:events,cicle_name',
                 'start_date' => 'required|date',
-                'is_active' => 'sometimes|boolen',
+                'is_active' => 'sometimes|boolean',
             ], $messages);
 
             if ($validator->fails()) {

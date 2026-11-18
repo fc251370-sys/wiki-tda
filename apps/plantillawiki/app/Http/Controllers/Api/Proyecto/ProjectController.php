@@ -31,19 +31,26 @@ class ProjectController extends Controller
                 'eventSubject',
                 'members',
                 'files'
-            ])->get();
+            ])->paginate(10);
+
+            $paginationData = [
+                'current_page' => $proyectos->currentPage(),
+                'last_page' => $proyectos->lastPage(),
+                'per_page' => $proyectos->perPage(),
+                'total' => $proyectos->total(),
+            ];
 
             return ApiResponse::success(
                 'Listado de Proyectos',
                 200,
-                $proyectos
+                $proyectos->items(),
+                $paginationData
             );
 
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al obtener los proyectos',
-                500,
-                $e->getMessage()
+                500
             );
         }
     } 
@@ -51,51 +58,58 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-        try{
-            $validator = Validator::make($request->all(), [
-                'event_subject_id' => 'required|exists:event_subjects,id',
-                'title' => 'required|string|max:200',
-                'description' => 'nullable|string',
-                'repository_url' => 'nullable|string|max:255',
-            ]);
+    
+public function store(Request $request)
+{
+    try {
+        $messages = [
+            'event_subject_id.required' => 'La materia es requerida',
+            'event_subject_id.exists' => 'La materia seleccionada no existe',
+            'title.required' => 'El título del proyecto es requerido',
+            'title.string' => 'El título debe ser texto',
+            'repository_url.url' => 'La URL del repositorio no es válida',
+        ];
 
-            if ($validator->fails()) {
-                return ApiResponse::error(
-                    'Error de validación',
-                    422,
-                    $validator->errors()
-                );
-            }
+        $validator = Validator::make($request->all(), [
+            'event_subject_id' => 'required|exists:event_subjects,id',
+            'title' => 'required|string|max:200',
+            'description' => 'nullable|string',
+            'repository_url' => 'nullable|url|max:255',
+        ], $messages);
 
-            DB::beginTransaction();
-
-            $proyecto = Project::create($request->only([
-                'event_subject_id',
-                'title',
-                'description',
-                'repository_url'
-            ]));
-
-            DB::commit();
-
-            return ApiResponse::success(
-                'Proyecto creado exitosamente',
-                201,
-                $proyecto
-            );
-        } catch (\Exception $e) {
-            DB::rollback();
-
+        if ($validator->fails()) {
             return ApiResponse::error(
-                'Error al crear el proyecto',
-                500,
-                $e->getMessage()
+                $validator->errors()->first(),
+                422
             );
         }
+
+        DB::beginTransaction();
+
+        $proyecto = Project::create($request->only([
+            'event_subject_id',
+            'title',
+            'description',
+            'repository_url'
+        ]));
+
+        DB::commit();
+
+        return ApiResponse::success(
+            'Proyecto creado exitosamente',
+            201,
+            $proyecto
+        );
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return ApiResponse::error(
+            'Error al crear el proyecto',
+            500
+        );
     }
+}
 
     /**
      * Display the specified resource.
@@ -113,7 +127,7 @@ class ProjectController extends Controller
             if (!$proyecto) {
                 return ApiResponse::error(
                     'Proyecto no encontrado',
-                    404,
+                    404
                 );
             }
 
@@ -125,8 +139,7 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al mostrar el proyecto',
-                500,
-                $e->getMessage()
+                500
             );
         }
     }
@@ -143,7 +156,7 @@ class ProjectController extends Controller
             if (!$proyecto) {
                 return ApiResponse::error(
                     'Proyecto no encontrado',
-                    404,
+                    404
                 );
             }
 
@@ -184,8 +197,7 @@ class ProjectController extends Controller
 
             return ApiResponse::error(
                 'Error al actualizar el proyecto',
-                500,
-                $e->getMessage()
+                500
             );
         }
     }
@@ -202,7 +214,7 @@ class ProjectController extends Controller
             if (!$proyecto) {
                 return ApiResponse::error(
                     'Proyecto no encontrado',
-                    404,
+                    404
                 );
             }
 
@@ -218,8 +230,7 @@ class ProjectController extends Controller
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al desactivar el proyecto',
-                500,
-                $e->getMessage()
+                500
             );
         }
     }

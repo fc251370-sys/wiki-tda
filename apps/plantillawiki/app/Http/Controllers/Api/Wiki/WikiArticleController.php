@@ -83,7 +83,7 @@ class WikiArticleController extends Controller
 
             return ApiResponse::success('listado de articulos', 200, $articulosFormated, $paginationData);
         } catch (\Exception $e) {
-            return ApiResponse::error('Error al obtener las articulos', 500, $e->getMessage());
+            return ApiResponse::error('Error al obtener los articulos', 500, $e->getMessage());
         }
     }
 
