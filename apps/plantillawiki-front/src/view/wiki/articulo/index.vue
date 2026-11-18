@@ -204,6 +204,7 @@ import { useArticulos } from './composable/articuloComposable.js'
 import { useCategorias } from '../../wikiconf/categoria/composable/categoriaComposable.js'
 import { useTags } from '../../wikiconf/tag/composable/tagComposable.js'
 
+
 // Crear
 const dialogCrearArticulo = ref(false)
 const nuevoArticulo = ref({ title: '', content: '', category_id: null, tags: [], is_published: false })

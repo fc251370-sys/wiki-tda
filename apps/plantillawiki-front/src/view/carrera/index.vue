@@ -9,7 +9,7 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-btn v-tooltip:bottom="'Nueva Carrera'" color="primary" icon="mdi-plus" @click="abrirCrear" ></v-btn>
+                <v-btn v-if="puedeGestionar" v-tooltip:bottom="'Nueva Carrera'" color="primary" icon="mdi-plus" @click="abrirCrear" ></v-btn>
             </v-col>
             <v-col cols="auto">
                 <v-btn-toggle v-model="estadoFiltro" mandatory color="primary" density="compact" divided>
@@ -33,10 +33,10 @@
 
                         <!-- botones nuevos -->
 
-                        <v-btn v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" v-if="item.estado" @click="ActualizarCarrera(item)"></v-btn>
+                        <v-btn v-if="puedeGestionar && item.estado" v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" @click="ActualizarCarrera(item)"></v-btn>
                         
                         <!-- ELIMINAR PENDIENTE -->
-                        <v-btn v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
+                        <v-btn v-if="puedeGestionar" v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
     
                     </v-col>
                     </v-row>
@@ -125,6 +125,10 @@ import {ref,onMounted,watch,onBeforeUnmount} from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import {useCarreras} from './composable/carreraComposable'
 import TitleComponent from '../../components/TitleComponent.vue';
+
+import { canManageCarreras } from '../../utils/authSession.js';
+
+const puedeGestionar = canManageCarreras()
 const acciones = ref(true);
 
 // crear carrers

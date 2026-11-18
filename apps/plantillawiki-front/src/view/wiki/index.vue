@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <title-component :title="'Articulos de la ULS'" />
-    <v-row class="mb-6">
+    <v-row v-if="puedeGestionar" class="mb-6">
       <v-col cols="12" md="4">
         <v-card link @click="irA('articulo')">
           <v-card-title>Artículos</v-card-title>
@@ -15,7 +15,7 @@
       </v-col>
     </v-row>
 
-    <v-divider class="mb-6"></v-divider>
+    <v-divider v-if="puedeGestionar" class="mb-6"></v-divider>
 
     <div v-if="cargando" class="text-center my-8">
       <v-progress-circular indeterminate color="#1b0b3b"></v-progress-circular>
@@ -143,6 +143,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import TitleComponent from '../../components/TitleComponent.vue'
 import { useArticulos } from './articulo/composable/articuloComposable.js'
+
+
+import { canManageWiki } from '../../utils/authSession.js'
+
+const puedeGestionar = canManageWiki()
+
+
 const router = useRouter()
 
 const { articulos, obtenerArticulos } = useArticulos()
