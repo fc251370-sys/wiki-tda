@@ -1,6 +1,5 @@
 <template>
   <v-container fluid>
-    <!-- Banner de bienvenida -->
     <v-card color="#1b0b3b" theme="dark" rounded="lg" class="pa-6 mb-6" elevation="2">
       <div class="d-flex align-center justify-space-between flex-wrap ga-4">
         <div>
@@ -14,18 +13,15 @@
             Selecciona uno de los módulos de abajo para comenzar a gestionar la plataforma.
           </p>
         </div>
-        <v-icon size="64" class="opacity-50 d-none d-sm-flex">
-          mdi-view-dashboard-outline
-        </v-icon>
       </div>
     </v-card>
 
-    <!-- Título de sección -->
+   
     <div class="text-subtitle-1 font-weight-bold mb-3" style="color: #1b0b3b;">
       Módulos del sistema
     </div>
 
-    <!-- Cuadrícula de accesos rápidos (sin peticiones a la API) -->
+
     <v-row>
       <v-col
         v-for="modulo in modulos"
@@ -73,7 +69,7 @@
 </template>
 
 <script setup>
-// Lista estática de accesos directos: cero errores de API o imports
+
 const modulos = [
   {
     titulo: 'Artículos Wiki',

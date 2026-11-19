@@ -58,6 +58,9 @@ Route::prefix('eventos')->group(function () {
     });
 });
 
+//ruata para articulos cuando no este logeado jejej
+Route::get('/public/articulos', [WikiArticleController::class, 'publicIndex']);
+
 Route::middleware('auth:api')->group(function () {
 
     // carreras
