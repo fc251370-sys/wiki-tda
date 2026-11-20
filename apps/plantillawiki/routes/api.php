@@ -32,9 +32,17 @@ Route::prefix('auth')->group(function () {
             Route::get('/', [RolesController::class, 'getPermissions']);
         });
 
-    });
-});
+        Route::prefix('users')->group(function () {
+            Route::middleware('role:admin|coordinador')->get('/', [UserController::class, 'index']);
 
+            Route::middleware('role:admin')->group(function () {
+                Route::post('/crear', [UserController::class, 'store']);
+                Route::put('/{id}', [UserController::class, 'update']);
+                Route::delete('/{id}', [UserController::class, 'destroy']);
+            });   
+        });       
+    });           
+});               
 
 
 Route::prefix('eventos')->group(function () {
@@ -110,15 +118,3 @@ Route::middleware('auth:api')->group(function () {
     });
 
 });
-
-
-Route::middleware('auth:api')->group(function () {
-    // usuarios
-    Route::prefix('users')->middleware('role:admin|coordinador')->group(function () {
-        Route::get('/', [UserController::class, 'index']);
-        Route::post('/crear', [UserController::class, 'store']);
-        Route::put('/{id}', [UserController::class, 'update']);
-        Route::delete('/{id}', [UserController::class, 'destroy']);
-    });
-});
-
