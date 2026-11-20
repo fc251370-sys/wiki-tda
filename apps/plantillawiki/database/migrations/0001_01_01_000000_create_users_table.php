@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('password', 255);
             $table->string('role', 20)->default('student');
             $table->string('carnet_or_code', 50)->nullable();
+            //se agregop esto 
+            $table->boolean('estado')->default(true);
             //se agrego hasta aqui
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

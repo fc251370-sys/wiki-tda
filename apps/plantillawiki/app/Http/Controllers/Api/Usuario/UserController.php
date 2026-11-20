@@ -153,6 +153,23 @@ class UserController extends Controller
     public function show(string $id)
     {
         //
+        try{
+            $user = User::with('roles:id,name')->find($id);
+
+            if(!$user){
+            return ApiResponse::error('Usuario no encontrado',404);
+            }
+            return ApiResponse::success('Usuario encontrado',200,[
+                'id' => $user->id,
+                'nombre' => $user->name,
+                'email' => $user->email,
+                'carnet' => $user->carnet_or_code,
+                'carrera_id' => $user->carrera_id,
+                'roles' => $user->getRoleNames()->values(),
+            ]);
+        }catch (\Exception $e) {
+            return ApiResponse::error('Error al mostrar al usuario',500, $e->getMessage());
+        }
     }
 
     /**
@@ -194,7 +211,7 @@ class UserController extends Controller
                 return ApiResponse::error($validator->errors()->first(),422);
             }
 
-            $user = DB::transaction(function () use ($request, $user) {
+            DB::transaction(function () use ($request, $user) {
 
 
                 //recorre cada campo de los usuarios que se pueden editar y solo se modifica lo que se envie y lo que no asi queda
@@ -233,8 +250,32 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         //
+        try{
+
+            $user = User::find($id);
+            
+            if(!$user){
+            return ApiResponse::error('Ususario no encontrado',404);
+            }
+
+            //para que el admin no se desactive solo
+            if($user->id === $request->user()->id){
+            return ApiResponse::error('No puedes cambiar tu propio estado',422);
+            }
+            
+            $user->estado= !$user->estado;
+            $user->save();
+            
+            return ApiResponse::success('Estado del usuario actualizado correctamente',200,[
+                'id'=> $user->id,
+                'estado'=> $user->estado,
+            ]);
+        }catch (\Exception $e) {
+            return ApiResponse::error('Error al actualizar el estado del usuario',500);
+        }
+
     }
 }

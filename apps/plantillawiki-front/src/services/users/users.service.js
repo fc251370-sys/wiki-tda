@@ -1,16 +1,14 @@
 import api from '../../utils/axios'
 
-const obtenerUsuarios = async(page,params)=>{
-    const response = await api.get('auth/users',{
-        params:{
-            page,
-            perPage: 10,
-            ...params
-        }
-    })
-    return response
-}
+const users = async(params = {})=> await api.get('users', {params})
+const actualizarusers = async (id, data) => await api.put(`users/${id}`, data)
+const eliminarusers = async (id) => await api.delete(`users/${id}`)
+const crearusers = async (data) => await api.post(`users/crear`, data)
+
 
 export {
-    obtenerUsuarios
+    users,
+    actualizarusers,
+    eliminarusers,
+    crearusers,
 }
