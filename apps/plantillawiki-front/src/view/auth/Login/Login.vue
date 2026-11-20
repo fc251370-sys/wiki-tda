@@ -1,88 +1,29 @@
 <template>
   <main class="login-page">
-    <section class="login-brand-panel" aria-label="Fundación Educativa para el Software Libre">
-      <div class="login-brand">
-        <div class="login-brand__mark" aria-hidden="true">
-          <v-icon icon="mdi-school-outline" size="42" />
-        </div>
-        <div>
-          <div class="login-brand__name">FESOL</div>
-          <p class="login-brand__description">
-            Fundación Educativa<br />
-            para el Software Libre
-          </p>
-        </div>
+    <section class="login-brand-panel" aria-label="Universidad Luterana Salvadoreña">
+      <div class="login-brand-panel__name">
+        Universidad<br />
+        Luterana<br />
+        Salvadoreña
       </div>
-
-      <div class="login-illustration" aria-hidden="true">
-        <div class="login-illustration__orbit login-illustration__orbit--one" />
-        <div class="login-illustration__orbit login-illustration__orbit--two" />
-        <div class="login-illustration__code">
-          <v-icon icon="mdi-code-tags" size="30" />
-          <span />
-          <span />
-        </div>
-        <div class="login-illustration__dashboard">
-          <div class="login-illustration__dashboard-header">
-            <span />
-            <span />
-            <span />
-          </div>
-          <div class="login-illustration__dashboard-content">
-            <div class="login-illustration__chart">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            <div class="login-illustration__stats">
-              <v-icon icon="mdi-chart-donut" size="62" />
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-        </div>
-        <div class="login-illustration__people">
-          <v-icon icon="mdi-account-group-outline" size="116" />
-        </div>
-        <p class="login-brand-panel__motto">
-          Conocimiento que conecta,<br />
-          tecnología que transforma.
-        </p>
-      </div>
+      <span class="login-brand-panel__divider" aria-hidden="true" />
+      <p class="login-brand-panel__motto">Conocimiento que transforma</p>
     </section>
 
     <section class="login-form-panel">
       <header class="login-topbar">
-        <v-chip
-          variant="outlined"
-          color="secondary"
-          append-icon="mdi-chevron-down"
-          class="login-topbar__organization"
-        >
-          FESOL 2026
-        </v-chip>
+        
         <ThemeToggle />
-        <v-btn
-          icon="mdi-bell-outline"
-          variant="text"
-          color="secondary"
-          aria-label="Notificaciones"
-          disabled
-        />
-        <v-avatar color="secondary" size="38" class="login-topbar__avatar">
-          <v-icon icon="mdi-account" color="white" />
-        </v-avatar>
+        
+        
       </header>
 
       <div class="login-form-wrap">
         <div class="login-mobile-brand">
-          <div class="login-brand__mark" aria-hidden="true">
+          <div class="login-mobile-brand__mark" aria-hidden="true">
             <v-icon icon="mdi-school-outline" size="30" />
           </div>
-          <span>FESOL</span>
+          <span>Universidad Luterana Salvadoreña</span>
         </div>
 
         <div class="login-heading">
@@ -208,198 +149,43 @@ const submit = async () => {
   background: rgb(var(--v-theme-surface));
 }
 
+/* ---------- Panel izquierdo ---------- */
 .login-brand-panel {
-  position: relative;
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-  overflow: hidden;
+  align-items: center;
+  justify-content: center;
   padding: clamp(40px, 8vw, 110px);
   background:
     radial-gradient(ellipse at 52% 65%, rgb(31 45 127 / 55%), transparent 44%),
     linear-gradient(145deg, #0b2947 0%, #0d1239 100%);
   color: white;
-}
-
-.login-brand {
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.login-brand__mark {
-  display: grid;
-  width: 82px;
-  height: 82px;
-  flex: 0 0 82px;
-  place-items: center;
-  border: 2px solid rgb(255 255 255 / 80%);
-  border-radius: 50%;
-  color: white;
-}
-
-.login-brand__name {
-  font-size: clamp(2.6rem, 5vw, 4rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1;
-}
-
-.login-brand__description {
-  margin-top: 8px;
-  font-size: 1.05rem;
-  line-height: 1.35;
-}
-
-.login-illustration {
-  position: relative;
-  display: grid;
-  min-height: 450px;
-  flex: 1;
-  place-items: center;
-}
-
-.login-illustration__dashboard {
-  z-index: 1;
-  width: min(78%, 440px);
-  overflow: hidden;
-  border: 9px solid #274c83;
-  border-radius: 18px;
-  background: #f4f7fc;
-  box-shadow: 0 24px 50px rgb(0 0 0 / 30%);
-  transform: translateY(12px);
-}
-
-.login-illustration__dashboard-header {
-  display: flex;
-  gap: 7px;
-  padding: 12px;
-  background: #e6edf8;
-}
-
-.login-illustration__dashboard-header span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6f90bf;
-}
-
-.login-illustration__dashboard-content {
-  display: grid;
-  min-height: 190px;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 18px;
-  padding: 24px 20px;
-}
-
-.login-illustration__chart {
-  display: flex;
-  height: 150px;
-  align-items: end;
-  gap: 10px;
-  border-bottom: 2px solid #d0d9e8;
-}
-
-.login-illustration__chart span {
-  flex: 1;
-  border-radius: 5px 5px 0 0;
-  background: linear-gradient(#5984c2, #315a9b);
-}
-
-.login-illustration__chart span:nth-child(1) { height: 36%; }
-.login-illustration__chart span:nth-child(2) { height: 55%; }
-.login-illustration__chart span:nth-child(3) { height: 43%; }
-.login-illustration__chart span:nth-child(4) { height: 78%; }
-.login-illustration__chart span:nth-child(5) { height: 100%; }
-
-.login-illustration__stats {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: #315a9b;
-}
-
-.login-illustration__stats span {
-  width: 74%;
-  height: 6px;
-  border-radius: 8px;
-  background: #d7dfec;
-}
-
-.login-illustration__code {
-  position: absolute;
-  top: 20%;
-  left: 12%;
-  display: grid;
-  width: 72px;
-  height: 72px;
-  place-items: center;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 18px;
-  background: rgb(30 65 108 / 85%);
-  color: #80b6ff;
-  transform: rotate(-8deg);
-}
-
-.login-illustration__code span {
-  position: absolute;
-  right: -80px;
-  width: 50px;
-  height: 4px;
-  border-radius: 4px;
-  background: rgb(128 182 255 / 45%);
-}
-
-.login-illustration__code span:last-child {
-  right: -64px;
-  margin-top: 14px;
-  width: 34px;
-}
-
-.login-illustration__orbit {
-  position: absolute;
-  border: 1px solid rgb(127 176 232 / 24%);
-  border-radius: 50%;
-}
-
-.login-illustration__orbit--one {
-  width: 390px;
-  height: 150px;
-  transform: rotate(-24deg);
-}
-
-.login-illustration__orbit--two {
-  width: 430px;
-  height: 190px;
-  transform: rotate(26deg);
-}
-
-.login-illustration__people {
-  position: absolute;
-  z-index: 2;
-  right: 6%;
-  bottom: 8%;
-  display: grid;
-  width: 130px;
-  height: 130px;
-  place-items: center;
-  border-radius: 50%;
-  background: #234b7f;
-  color: #c8d9f0;
-  box-shadow: 0 14px 30px rgb(0 0 0 / 24%);
-}
-
-.login-brand-panel__motto {
-  z-index: 1;
-  color: rgb(255 255 255 / 75%);
-  font-size: 1rem;
-  line-height: 1.6;
   text-align: center;
 }
 
+.login-brand-panel__name {
+  font-size: clamp(2.2rem, 4.2vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+
+.login-brand-panel__divider {
+  width: 64px;
+  height: 3px;
+  margin: 28px 0 22px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 55%);
+}
+
+.login-brand-panel__motto {
+  color: rgb(255 255 255 / 78%);
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Panel derecho (igual que el original) ---------- */
 .login-form-panel {
   display: flex;
   min-height: 100vh;
@@ -451,7 +237,7 @@ const submit = async () => {
 
 .login-heading p {
   margin-top: 8px;
-  color: rgb(var(--v-theme-on-surface-variant));
+  color: black;
   font-size: 0.98rem;
 }
 
@@ -503,6 +289,7 @@ const submit = async () => {
   text-align: center;
 }
 
+/* Marca que aparece solo en móvil, cuando se oculta el panel izquierdo */
 .login-mobile-brand {
   display: none;
 }
@@ -514,30 +301,6 @@ const submit = async () => {
 
   .login-brand-panel {
     padding: 40px;
-  }
-
-  .login-brand__mark {
-    width: 64px;
-    height: 64px;
-    flex-basis: 64px;
-  }
-
-  .login-brand__description {
-    font-size: 0.9rem;
-  }
-
-  .login-illustration__dashboard {
-    width: 90%;
-  }
-
-  .login-illustration__people {
-    right: 0;
-    width: 96px;
-    height: 96px;
-  }
-
-  .login-illustration__people :deep(.v-icon) {
-    font-size: 84px !important;
   }
 }
 
@@ -561,16 +324,19 @@ const submit = async () => {
     gap: 12px;
     margin-bottom: 44px;
     color: rgb(var(--v-theme-primary));
-    font-size: 1.3rem;
+    font-size: 1.05rem;
     font-weight: 700;
+    line-height: 1.2;
   }
 
-  .login-mobile-brand .login-brand__mark {
+  .login-mobile-brand__mark {
+    display: grid;
     width: 48px;
     height: 48px;
-    flex-basis: 48px;
-    border-color: rgb(var(--v-theme-primary));
-    color: rgb(var(--v-theme-primary));
+    flex: 0 0 48px;
+    place-items: center;
+    border: 2px solid rgb(var(--v-theme-primary));
+    border-radius: 50%;
   }
 
   .login-topbar__organization {

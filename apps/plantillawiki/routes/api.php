@@ -33,19 +33,19 @@ Route::prefix('auth')->group(function () {
         Route::prefix('permissions')->group(function () {
             Route::get('/', [RolesController::class, 'getPermissions']);
         });
-        Route::prefix('users')->group(function(){
-            Route::get('/',[UserController::class,'index']);
-        });
-    });
-});
 
-Route::prefix('carreras')->group(function () {
-    Route::get('/', [CarreraController::class, 'index']);
-    Route::post('/crear', [CarreraController::class, 'store']);
-    Route::get('/{id}', [CarreraController::class, 'showById']);
-    Route::put('/{id}', [CarreraController::class, 'update']);
-    Route::delete('/{id}', [CarreraController::class, 'destroy']);
-});
+        Route::prefix('users')->group(function () {
+            Route::middleware('role:admin|coordinador')->get('/', [UserController::class, 'index']);
+
+            Route::middleware('role:admin')->group(function () {
+                Route::post('/crear', [UserController::class, 'store']);
+                Route::put('/{id}', [UserController::class, 'update']);
+                Route::delete('/{id}', [UserController::class, 'destroy']);
+            });   
+        });       
+    });           
+});               
+
 
 Route::prefix('eventos')->group(function () {
     Route::get('/', [EventController::class, 'index']);
@@ -66,42 +66,74 @@ Route::prefix('eventos')->group(function () {
     });
 });
 
-Route::prefix('categorias')->group(function () {
-    Route::get('/', [WikiCategoryController::class, 'index']);
-    Route::post('/crear', [WikiCategoryController::class, 'store']);
-    Route::get('/{id}', [WikiCategoryController::class, 'showById']);
-    Route::put('/{id}', [WikiCategoryController::class, 'update']);
-    Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
-});
+//ruata para articulos cuando no este logeado jejej
+Route::get('/public/articulos', [WikiArticleController::class, 'publicIndex']);
 
-Route::prefix('tags')->group(function () {
-    Route::get('/', [WikiTagController::class, 'index']);
-    Route::post('/crear', [WikiTagController::class, 'store']);
-    Route::get('/{id}', [WikiTagController::class, 'showById']);
-    Route::put('/{id}', [WikiTagController::class, 'update']);
-    Route::delete('/{id}', [WikiTagController::class, 'destroy']);
-});
+Route::middleware('auth:api')->group(function () {
 
-Route::prefix('articulos')->group(function () {
-    Route::get('/', [WikiArticleController::class, 'index']);
-    Route::post('/crear', [WikiArticleController::class, 'store']);
-    Route::get('/{id}', [WikiArticleController::class, 'showById']);
-    Route::put('/{id}', [WikiArticleController::class, 'update']);
-    Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
+    // carreras
+    Route::prefix('carreras')->group(function () {
+        Route::get('/', [CarreraController::class, 'index']);
+        Route::get('/{id}', [CarreraController::class, 'showById']);
 
-});
 
-Route::prefix('proyectos')->group(function () {
-    Route::get('/', [ProjectController::class, 'index']);
-    Route::post('/crear', [ProjectController::class, 'store']);
-    Route::get('/{id}', [ProjectController::class, 'show']);
-    Route::put('/{id}', [ProjectController::class, 'update']);
-    Route::delete('/{id}', [ProjectController::class, 'destroy']);
+        Route::middleware('role:admin|coordinador')->group(function () {
+            Route::post('/crear', [CarreraController::class, 'store']);
+            Route::put('/{id}', [CarreraController::class, 'update']);
+            Route::delete('/{id}', [CarreraController::class, 'destroy']);
+        });
+    });
 
-    Route::get('/{projectId}/archivos', [ProjectFileController::class, 'index']);
-    Route::post('/{projectId}/archivos', [ProjectFileController::class, 'store']);
-    Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);
-    Route::put('/archivos/{id}', [ProjectFileController::class, 'update']);
-    Route::delete('/archivos/{id}', [ProjectFileController::class, 'destroy']);
-    Route::get('/archivos/{id}/descargar', [ProjectFileController::class, 'download']);
+    // categorias
+    Route::prefix('categorias')->group(function () {
+        Route::get('/', [WikiCategoryController::class, 'index']);
+        Route::get('/{id}', [WikiCategoryController::class, 'showById']);
+
+        Route::middleware('role:admin|coordinador|teacher')->group(function () {
+            Route::post('/crear', [WikiCategoryController::class, 'store']);
+            Route::put('/{id}', [WikiCategoryController::class, 'update']);
+            Route::delete('/{id}', [WikiCategoryController::class, 'destroy']);
+        });
+    });
+
+    // tags
+    Route::prefix('tags')->group(function () {
+        Route::get('/', [WikiTagController::class, 'index']);
+        Route::get('/{id}', [WikiTagController::class, 'showById']);
+
+        Route::middleware('role:admin|coordinador|teacher')->group(function () {
+            Route::post('/crear', [WikiTagController::class, 'store']);
+            Route::put('/{id}', [WikiTagController::class, 'update']);
+            Route::delete('/{id}', [WikiTagController::class, 'destroy']);
+        });
+    });
+
+    // articulos
+    Route::prefix('articulos')->group(function () {
+        Route::get('/', [WikiArticleController::class, 'index']);
+        Route::get('/{id}', [WikiArticleController::class, 'showById']);
+
+        Route::middleware('role:admin|coordinador|teacher')->group(function () {
+            Route::post('/crear', [WikiArticleController::class, 'store']);
+            Route::put('/{id}', [WikiArticleController::class, 'update']);
+            Route::delete('/{id}', [WikiArticleController::class, 'destroy']);
+        });
+    });
+
+    // proyectos
+    Route::prefix('proyectos')->group(function () {
+        Route::get('/', [ProjectController::class, 'index']);
+        Route::post('/crear', [ProjectController::class, 'store']);
+        Route::get('/{id}', [ProjectController::class, 'show']);
+        Route::put('/{id}', [ProjectController::class, 'update']);
+        Route::delete('/{id}', [ProjectController::class, 'destroy']);
+
+        Route::get('/{projectId}/archivos', [ProjectFileController::class, 'index']);
+        Route::post('/{projectId}/archivos', [ProjectFileController::class, 'store']);
+        Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);
+        Route::put('/archivos/{id}', [ProjectFileController::class, 'update']);
+        Route::delete('/archivos/{id}', [ProjectFileController::class, 'destroy']);
+        Route::get('/archivos/{id}/descargar', [ProjectFileController::class, 'download']);
+    });
+
 });
