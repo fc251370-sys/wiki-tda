@@ -5,11 +5,12 @@ import AdminLayout from '../view/layout/admin-layout.vue'
 import Home from '../view/Home.vue'
 import AdminDashboard from '../view/AdminDashboard.vue'
 import { routerAuth } from '../view/auth/router.js'
-import { configurationRouter } from '../view/configuracion/router.js'
+//import { configurationRouter } from '../view/configuracion/router.js'
 import { routerCarrera } from '../view/carrera/router.js'
 import { routerEvento } from '../view/evento/router.js'
 import { routerProyecto } from '../view/proyecto/router.js'
 import { routerWiki } from '../view/wiki/router.js'
+import { routerWikiconf } from '../view/wikiconf/router.js'
 import { routerUsers } from '../view/users/router.js'
 import { getStoredList } from '../utils/access.js'
 const routes = [
@@ -41,12 +42,13 @@ const routes = [
           roles: ['admin'],
         }
       },
-      ...configurationRouter,
+      //...configurationRouter,
       ...routerCarrera,
       ...routerEvento,
       ...routerProyecto,
       ...routerWiki,
-      ...routerUsers
+      ...routerWikiconf,
+      ...routerUsers,
     ],
     meta: {
       requiresAuth: true,

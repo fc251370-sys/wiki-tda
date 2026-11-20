@@ -1,11 +1,11 @@
 <template>
   <div>
-    <!-- Botón para volver a las cards de wiki -->
-    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/admin/wiki')">
+    <!-- boton para volver-->
+    <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/admin/wikiconf')">
     Volver
     </v-btn>
 
-    <!-- Buscador de categorías -->
+    <!-- buscador de categorias -->
     <v-row class="d-flex justify-end">
       <v-col cols="12" md="4">
         <v-text-field
@@ -19,7 +19,7 @@
       </v-col>
     </v-row>
 
-    <!-- Botón nueva + filtro de estado -->
+    <!-- boton nueva + filtro de estado -->
     <v-row>
       <v-col>
         <v-btn
@@ -38,7 +38,7 @@
       </v-col>
     </v-row>
 
-    <!-- Tabla de categorías -->
+    <!-- tabla de categorias -->
     <data-table-component
       :key="tablaKey"
       :totalPage="pagination?.last_page"
@@ -47,14 +47,14 @@
       :items="categorias"
       @update:page="paginationMethod"
     >
-      <!-- Chip de estado -->
+      <!--estado -->
       <template v-slot:item.estado="{ item }">
         <v-chip :color="item.estado ? 'success' : 'error'">
           {{ item.estado ? 'Activo' : 'Inactivo' }}
         </v-chip>
       </template>
 
-      <!-- Botones de acción -->
+      <!-- botones de accion -->
       <template v-slot:item.acciones="{ item }">
         <v-btn
           v-tooltip:bottom="'Ver'"
@@ -81,7 +81,7 @@
       </template>
     </data-table-component>
 
-    <!-- Diálogo ver categoría -->
+    <!-- ver categoría -->
     <v-dialog v-model="dialogVerCategoria" persistent>
       <v-card class="mx-auto my-8" elevation="4" width="500" rounded="lg">
         <v-card-item>
@@ -103,7 +103,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo editar categoría -->
+    <!-- editar categoría -->
     <v-dialog v-model="dialogActualizarCategoria" max-width="500" persistent>
       <v-card>
         <v-card-title>Editar categoría</v-card-title>
@@ -124,7 +124,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo crear categoría -->
+    <!-- crear categoría -->
     <v-dialog v-model="dialogCrearCategoria" max-width="500" persistent>
       <v-card>
         <v-card-title>Crear categoría</v-card-title>
@@ -151,47 +151,42 @@
 </template>
 
 <script setup>
-// ref, onMounted, watch, onBeforeUnmount para el componente
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
-// Componente de tabla reutilizable
 import DataTableComponent from '../../../components/DataTableComponent.vue'
-// Composable de categorías (ya lo creaste)
 import { useCategorias } from './composable/categoriaComposable.js'
 
-// Crear categoría
+// crear categoria
 const dialogCrearCategoria = ref(false)
 const nuevaCategoria = ref({ name: '', slug: '', description: '' })
 const formNueva = ref(null)
 const creando = ref(false)
 
-// Ver categoría
+// ver categoria
 const dialogVerCategoria = ref(false)
 const categoria = ref(null)
 
-// Editar categoría
+// editar categoria
 const dialogActualizarCategoria = ref(false)
 const form = ref({ id: null, name: '', slug: '', description: '' })
 const formEditar = ref(null)
 const guardando = ref(false)
 
-// Buscador
+// buscador
 const search = ref('')
 let searchTimeout
 
-// Filtro de estado
+// filtro de estado
 const estadoFiltro = ref('todas')
 const filtros = () => ({
   name: search.value?.trim() || undefined,
   estado: estadoFiltro.value === 'todas' ? undefined : estadoFiltro.value === 'activas'
 })
 
-// Composable
 const {
   categorias, pagination,
   obtenerCategorias, actualizarCategorias, eliminarCategorias, crearCategorias
 } = useCategorias()
 
-// Headers de la tabla
 const headers = ref([
   { title: 'Nombre', key: 'name' },
   { title: 'Slug', key: 'slug' },
@@ -210,7 +205,7 @@ const paginationMethod = async (page) => {
   await obtenerCategorias(page, filtros())
 }
 
-// Buscador con debounce
+// Buscador
 watch(search, () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
@@ -229,20 +224,20 @@ const recargar = async () => {
 
 onBeforeUnmount(() => clearTimeout(searchTimeout))
 
-// Ver categoría
+// ver categoria
 const verCategoria = (item) => {
   dialogVerCategoria.value = true
   categoria.value = item
 }
 
-// Abrir edición
+// abrir edicion
 const ActualizarCategoria = (item) => {
   form.value = { id: item.id, name: item.name, description: item.description }
   dialogActualizarCategoria.value = true
   categoria.value = item
 }
 
-// Guardar edición
+// guardar edicion
 const guardarEdicion = async () => {
   const { valid } = await formEditar.value.validate()
   if (!valid) return
@@ -260,7 +255,7 @@ const guardarEdicion = async () => {
   }
 }
 
-// Cambiar estado
+// cambiar estado
 const cambiarEstado = async (item) => {
   const ok = await eliminarCategorias(item.id)
   if (ok) {
