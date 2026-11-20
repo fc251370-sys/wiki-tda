@@ -31,9 +31,7 @@ Route::prefix('auth')->group(function () {
         Route::prefix('permissions')->group(function () {
             Route::get('/', [RolesController::class, 'getPermissions']);
         });
-        Route::prefix('users')->group(function(){
-            Route::get('/',[UserController::class,'index']);
-        });
+
     });
 });
 
@@ -113,4 +111,14 @@ Route::middleware('auth:api')->group(function () {
 
 });
 
+
+Route::middleware('auth:api')->group(function () {
+    // usuarios
+    Route::prefix('users')->middleware('role:admin|coordinador')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/crear', [UserController::class, 'store']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+    });
+});
 
