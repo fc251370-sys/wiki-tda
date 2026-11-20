@@ -133,10 +133,8 @@ class ProjectFileController extends Controller
                 );
             }
 
-            return Storage::download(
-                $archivo->file_path,
-                $archivo->original_name
-            );
+            return Storage::response($archivo->file_path);
+
         } catch (\Exception $e) {
             return ApiResponse::error(
                 'Error al descargar el archivo',
@@ -144,7 +142,35 @@ class ProjectFileController extends Controller
             );
         }
     }
+                // Descargar un archivo por su ID
+        public function download(string $id)
+        {
+            try {
+                 $archivo = ProjectFile::where('estado', true)->find($id);
 
+                if (!$archivo) {
+                    return ApiResponse::error('Archivo no encontrado', 404);
+                }
+
+                if (!Storage::exists($archivo->file_path)) {
+                    return ApiResponse::error(
+                        'El archivo no existe en el almacenamiento',
+                        404
+                    );
+                }
+
+        return Storage::download(
+            $archivo->file_path,
+            $archivo->original_name
+        );
+
+    } catch (\Exception $e) {
+        return ApiResponse::error(
+            'Error al descargar el archivo',
+            500
+        );
+    }
+    }
     // Actualizar un archivo
     public function update(Request $request, string $id)
     {
@@ -156,7 +182,7 @@ class ProjectFileController extends Controller
             if (!$archivoGuardado) {
                 return ApiResponse::error('Archivo no encontrado', 404);
             }
-
+           
             $validator = Validator::make($request->all(), [
                 'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png|max:10240',
             ]);

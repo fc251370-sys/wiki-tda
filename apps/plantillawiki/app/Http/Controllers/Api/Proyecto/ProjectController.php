@@ -27,11 +27,16 @@ class ProjectController extends Controller
     public function index()
     {
         try{
-            $proyectos = Project::with([
+           $proyectos = Project::with([
                 'eventSubject',
                 'members',
                 'files'
-            ])->paginate(10);
+            ])
+            ->when(request('search'), function ($query) {
+               $query->whereRaw('LOWER(title) LIKE ?', ['%' . strtolower(request('search')) . '%']);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
             $paginationData = [
                 'current_page' => $proyectos->currentPage(),

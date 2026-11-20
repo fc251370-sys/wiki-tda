@@ -103,4 +103,5 @@ Route::prefix('proyectos')->group(function () {
     Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);
     Route::put('/archivos/{id}', [ProjectFileController::class, 'update']);
     Route::delete('/archivos/{id}', [ProjectFileController::class, 'destroy']);
+    Route::get('/archivos/{id}/descargar', [ProjectFileController::class, 'download']);
 });
