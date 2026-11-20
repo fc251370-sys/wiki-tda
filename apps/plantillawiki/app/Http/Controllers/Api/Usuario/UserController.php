@@ -31,6 +31,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'perPage' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'search' => ['nullable', 'string', 'max:100'],
+            'role' => ['nullable', 'string', 'max:50'],
         ]);
 
         $perPage = $validated['perPage'] ?? 1;
@@ -46,6 +47,10 @@ class UserController extends Controller
                         ->orWhere('email', 'ilike', "%{$search}%")
                         ->orWhere('carnet_or_code', 'ilike', "%{$search}%");
                 });
+            })
+
+            ->when($validated['role'] ?? null, function ($query, $role) {
+                $query->role($role, 'api');
             });
 
         $userPaginate = $users->paginate($perPage);
@@ -58,6 +63,7 @@ class UserController extends Controller
 
         $userMap = $userPaginate->map(function ($user) {
             return [
+                'id' => $user->id,
                 'nombre' => $user->name,
                 'email' => $user->email,
                 'carnet' => $user->carnet_or_code,
