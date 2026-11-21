@@ -4,7 +4,7 @@ export const routerUsers = [
         name: 'Usuarios',
         component: () => import('./index.vue'),
         meta: {
-            roles: ['admin'],
+            roles: ['admin', 'coordinador'],
         },
     }
 ]

@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\Evento\EventSubjectController;
 use App\Http\Controllers\Api\Wiki\WikiCategoryController;
 use App\Http\Controllers\Api\Wiki\WikiTagController;
 use App\Http\Controllers\Api\Wiki\WikiArticleController;
+use App\Http\Controllers\Api\Proyecto\ProjectController;
+use App\Http\Controllers\Api\Proyecto\ProjectFileController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/refresh', [LoginController::class, 'refresh'])
@@ -31,12 +33,18 @@ Route::prefix('auth')->group(function () {
         Route::prefix('permissions')->group(function () {
             Route::get('/', [RolesController::class, 'getPermissions']);
         });
-        Route::prefix('users')->group(function(){
-            Route::get('/',[UserController::class,'index']);
-        });
-    });
-});
 
+        Route::prefix('users')->group(function () {
+            Route::middleware('role:admin|coordinador')->get('/', [UserController::class, 'index']);
+
+            Route::middleware('role:admin')->group(function () {
+                Route::post('/crear', [UserController::class, 'store']);
+                Route::put('/{id}', [UserController::class, 'update']);
+                Route::delete('/{id}', [UserController::class, 'destroy']);
+            });   
+        });       
+    });           
+});               
 
 
 Route::prefix('eventos')->group(function () {
@@ -67,6 +75,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('carreras')->group(function () {
         Route::get('/', [CarreraController::class, 'index']);
         Route::get('/{id}', [CarreraController::class, 'showById']);
+
 
         Route::middleware('role:admin|coordinador')->group(function () {
             Route::post('/crear', [CarreraController::class, 'store']);
@@ -111,6 +120,20 @@ Route::middleware('auth:api')->group(function () {
         });
     });
 
+    // proyectos
+    Route::prefix('proyectos')->group(function () {
+        Route::get('/', [ProjectController::class, 'index']);
+        Route::post('/crear', [ProjectController::class, 'store']);
+        Route::get('/{id}', [ProjectController::class, 'show']);
+        Route::put('/{id}', [ProjectController::class, 'update']);
+        Route::delete('/{id}', [ProjectController::class, 'destroy']);
+
+        Route::get('/{projectId}/archivos', [ProjectFileController::class, 'index']);
+        Route::post('/{projectId}/archivos', [ProjectFileController::class, 'store']);
+        Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);
+        Route::put('/archivos/{id}', [ProjectFileController::class, 'update']);
+        Route::delete('/archivos/{id}', [ProjectFileController::class, 'destroy']);
+        Route::get('/archivos/{id}/descargar', [ProjectFileController::class, 'download']);
+    });
+
 });
-
-
