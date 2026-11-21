@@ -127,7 +127,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/{id}', [ProjectController::class, 'show']);
         Route::put('/{id}', [ProjectController::class, 'update']);
         Route::delete('/{id}', [ProjectController::class, 'destroy']);
-
+        Route::put('/{id}/activar', [ProjectController::class, 'activar'] );
+  
+        
         Route::get('/{projectId}/archivos', [ProjectFileController::class, 'index']);
         Route::post('/{projectId}/archivos', [ProjectFileController::class, 'store']);
         Route::get('/archivos/{id}', [ProjectFileController::class, 'show']);

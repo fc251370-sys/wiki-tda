@@ -74,6 +74,15 @@
                     density="compact"
                     @click="cambiarEstado(proyecto)"
                 />
+
+                <v-btn
+                    v-if="!proyecto.estado"
+                    v-tooltip:bottom="'Activar'"
+                    icon="mdi-check-circle"
+                    color="success"
+                    density="compact"
+                    @click="activarEstado(proyecto)"
+                />
             </v-card-actions>
         </v-card>
     </v-col>
@@ -343,6 +352,7 @@ const {
     pagination,
     obtenerProyectos,
     eliminarProyecto,
+    activarProyecto,
     crearProyecto,
     actualizarProyecto,
     subirArchivo,
@@ -486,6 +496,24 @@ const cambiarEstado = async (item) => {
     }
 }
 
+<<<<<<< HEAD
+// Activar un proyecto
+const activarEstado = async (item) => {
+    const confirmar = window.confirm(
+        `¿Deseas activar el proyecto ${item.title}?`
+    )
+
+    if (!confirmar) return
+
+    const ok = await activarProyecto(item.id)
+
+    if (ok) {
+        await obtenerProyectos()
+    }
+}
+
+=======
+>>>>>>> origin/master
 // Cargar los proyectos
 onMounted(async () => {
     await obtenerProyectos()

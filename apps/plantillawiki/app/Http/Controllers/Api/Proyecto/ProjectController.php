@@ -239,4 +239,30 @@ public function store(Request $request)
             );
         }
     }
+    public function activar(string $id){
+        try{
+            $proyecto = Project::find($id);
+
+            if(!$proyecto){
+                return ApiResponse::error(
+                    'Proyecto no encontrado',
+                    404
+                );
+            }
+            $proyecto->estado = true;
+            $proyecto->save();
+
+            return ApiResponse::success(
+                'Proyecto activado exitosamente',
+                200,
+                $proyecto
+            );
+
+        } catch (\Exception $e) {
+            return ApiResponse::error(
+                'Error al activar el proyecto',
+                500
+            );
+        }
+    }
 }

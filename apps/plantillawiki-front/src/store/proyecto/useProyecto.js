@@ -4,6 +4,7 @@ import {
     proyectos,
     actualizarProyecto,
     eliminarProyecto,
+    activarProyecto,
     crearProyecto,
     subirArchivo,
     actualizarArchivo,
@@ -49,6 +50,16 @@ export const useProyectoStore = defineStore('proyectos',{
                 console.log(error);
             }
         },
+
+        async activarProyecto(id){
+            try {
+                const response = await activarProyecto(id);
+
+                return response.status;
+            } catch (error) {
+                console.log(error);
+            }
+        }, 
 
         async crearProyecto(data){
             try {
