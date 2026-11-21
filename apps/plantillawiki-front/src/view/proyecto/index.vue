@@ -496,6 +496,7 @@ const cambiarEstado = async (item) => {
     }
 }
 
+<<<<<<< HEAD
 // Activar un proyecto
 const activarEstado = async (item) => {
     const confirmar = window.confirm(
@@ -511,6 +512,8 @@ const activarEstado = async (item) => {
     }
 }
 
+=======
+>>>>>>> origin/master
 // Cargar los proyectos
 onMounted(async () => {
     await obtenerProyectos()

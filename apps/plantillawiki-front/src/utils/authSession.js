@@ -18,7 +18,7 @@ export function hasRole(...roles) {
 }
 
 export function canManageCarreras() {
-  return hasRole('admin', 'coordenador')
+  return hasRole('admin', 'coordinador')
 }
 
 export function canManageWiki() {

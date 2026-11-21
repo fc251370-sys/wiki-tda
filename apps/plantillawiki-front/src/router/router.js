@@ -62,34 +62,33 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-    const isAuthenticated = !!localStorage.getItem('token');
-    const roles = getStoredList('roles');
+router.beforeEach((to) => {
+    const isAuthenticated = !!localStorage.getItem('token')
+    const roles = getStoredList('roles')
 
     // Rutas protegidas
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!isAuthenticated) {
-            return next({ name: 'Login' });
+            return { name: 'Login' }
         }
 
-        const requiredRoles = to.matched.flatMap(record => record.meta.roles ?? []);
+        const requiredRoles = to.matched.flatMap(record => record.meta.roles ?? [])
         if (requiredRoles.length && !requiredRoles.some(role => roles.includes(role))) {
-            return next({ path: '/wiki' });
+            return { path: '/wiki' }
         }
 
-        return next();
+        return true
     }
 
     // Rutas solo para invitados
     if (to.matched.some(record => record.meta.guestOnly)) {
         if (isAuthenticated) {
-            return next(roles.includes('admin') ? { name: 'Dashboard' } : { path: '/wiki' });
+            return roles.includes('admin') ? { name: 'Dashboard' } : { path: '/wiki' }
         }
 
-        return next();
+        return true
     }
 
-    next();
-});
-
+    return true
+})
 export default router
