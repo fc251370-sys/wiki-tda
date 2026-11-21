@@ -36,6 +36,9 @@
             <template v-slot:item.acciones="{ item }">
                 <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verEvento(item)"></v-btn>
 
+                <!-- materias del evento (todos las ven, solo admin y coordinador las gestionan) -->
+                <v-btn v-tooltip:bottom="'Materias'" class="ml-2" density="compact" icon="mdi-book-open-variant" @click="abrirMaterias(item)"></v-btn>
+
                 <v-btn v-if="esGestor && item.estado" v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" @click="abrirEditar(item)"></v-btn>
 
                 <!-- activar o desactivar el ciclo (solo si el evento esta habilitado) -->
@@ -104,11 +107,81 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <!-- materias del evento -->
+        <v-dialog v-model="dialogMaterias" max-width="900" persistent>
+            <v-card>
+                <v-card-title class="d-flex align-center">
+                    <span>Materias de {{ eventoMaterias?.cicle_name }}</span>
+                    <v-spacer></v-spacer>
+                    <v-btn v-if="esGestor" v-tooltip:bottom="'Agregar materia'" color="primary" icon="mdi-plus" density="comfortable" @click="abrirCrearMateria"></v-btn>
+                </v-card-title>
+                <v-card-text>
+                    <data-table-component :key="materiasKey" :totalPage="paginationMaterias?.last_page" :page="paginationMaterias?.current_page" :headers="headersMaterias" :items="materiasVisibles" @update:page="paginationMateriasMethod">
+                        <template v-slot:item.carrera="{ item }">
+                            {{ item.carrera?.name }}
+                        </template>
+                        <template v-slot:item.teacher="{ item }">
+                            {{ item.teacher?.name }}
+                        </template>
+                        <template v-slot:item.estado="{ item }">
+                            <v-chip :color="item.estado ? 'success' : 'error'">
+                                {{ item.estado ? 'Habilitada' : 'Deshabilitada' }}
+                            </v-chip>
+                        </template>
+                        <template v-slot:item.acciones="{ item }">
+                            <v-btn v-if="item.estado" v-tooltip:bottom="'Editar'" density="compact" icon="mdi-pencil" @click="abrirEditarMateria(item)"></v-btn>
+                            <v-btn v-tooltip:bottom="item.estado ? 'Deshabilitar' : 'Habilitar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstadoMateriaItem(item)"></v-btn>
+                        </template>
+                    </data-table-component>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="cerrarMaterias">Cerrar</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- crear / editar materia -->
+        <v-dialog v-model="dialogMateria" max-width="500" persistent>
+            <v-card>
+                <v-card-title>{{ esEdicionMateria ? 'Editar materia' : 'Agregar materia' }}</v-card-title>
+                <v-card-text>
+                    <v-form ref="formMateriaRef">
+                        <v-text-field
+                            v-model="formMateria.subject_name"
+                            label="Nombre de la materia"
+                            :rules="[v => !!v?.trim() || 'El nombre de la materia es obligatorio', v => v?.trim().length >= 3 || 'Mínimo 3 caracteres', v => v?.trim().length <= 150 || 'Máximo 150 caracteres']"
+                        />
+                        <v-select
+                            v-model="formMateria.carrera_id"
+                            :items="carreraItems"
+                            item-title="title"
+                            item-value="id"
+                            label="Carrera"
+                            :rules="[v => !!v || 'La carrera es obligatoria']"
+                        />
+                        <v-select
+                            v-model="formMateria.teacher_id"
+                            :items="docenteItems"
+                            item-title="title"
+                            item-value="id"
+                            label="Docente"
+                            :rules="[v => !!v || 'El docente es obligatorio']"
+                        />
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="dialogMateria = false">Cancelar</v-btn>
+                    <v-btn color="primary" :loading="guardandoMateria" @click="guardarMateria">Guardar</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import TitleComponent from '../../components/TitleComponent.vue';
 import { useEventos } from './composable/eventoComposable'
@@ -124,6 +197,16 @@ const {
     actualizarEvento,
     cambiarEstadoEvento,
     alternarActivoEvento,
+    materias,
+    paginationMaterias,
+    carreras,
+    docentes,
+    obtenerMaterias,
+    obtenerCarreras,
+    obtenerDocentes,
+    crearMateria,
+    actualizarMateria,
+    cambiarEstadoMateria,
 } = useEventos();
 
 // admin y coordinador gestionan los eventos; docente y estudiante solo ven el evento activo
@@ -242,6 +325,117 @@ const alternarActivo = async (item) => {
 // deshabilitar o habilitar el evento
 const cambiarEstado = async (item) => {
     await cambiarEstadoEvento(item.id);
+    await refrescarTabla();
+}
+
+// materias del evento
+const dialogMaterias = ref(false);
+const eventoMaterias = ref(null);
+const materiasKey = ref(0);
+
+const headersMaterias = ref(esGestor
+    ? [
+        { title: 'Materia', key: 'subject_name' },
+        { title: 'Carrera', key: 'carrera' },
+        { title: 'Docente', key: 'teacher' },
+        { title: 'Proyectos', key: 'projects_count' },
+        { title: 'Estado', key: 'estado' },
+        { title: 'Acciones', key: 'acciones' },
+    ]
+    : [
+        { title: 'Materia', key: 'subject_name' },
+        { title: 'Carrera', key: 'carrera' },
+        { title: 'Docente', key: 'teacher' },
+        { title: 'Proyectos', key: 'projects_count' },
+    ]);
+
+// quien no gestiona solo ve las materias habilitadas
+const materiasVisibles = computed(() => esGestor ? materias.value : materias.value.filter(m => m.estado));
+
+const cargarMaterias = async (page = 1) => {
+    if (!eventoMaterias.value) return;
+    await obtenerMaterias(eventoMaterias.value.id, page);
+    materiasKey.value++;
+}
+
+const abrirMaterias = async (item) => {
+    eventoMaterias.value = item;
+    dialogMaterias.value = true;
+    await cargarMaterias(1);
+}
+
+const cerrarMaterias = () => {
+    dialogMaterias.value = false;
+    eventoMaterias.value = null;
+}
+
+const paginationMateriasMethod = async (page) => {
+    await cargarMaterias(page);
+}
+
+// crear y editar materia (mismo formulario)
+const dialogMateria = ref(false);
+const esEdicionMateria = ref(false);
+const formMateriaRef = ref(null);
+const guardandoMateria = ref(false);
+const formMateria = ref({ id: null, subject_name: '', carrera_id: null, teacher_id: null });
+
+// los selectores usan solo id y titulo
+const carreraItems = computed(() => carreras.value.map(c => ({ id: c.id, title: c.name ?? c.nombre ?? c.carrera_name ?? `Carrera ${c.id}` })));
+const docenteItems = computed(() => docentes.value.map(u => ({ id: u.id, title: u.nombre ?? u.name ?? u.email })));
+
+const cargarListasMateria = () => {
+    if (!carreras.value.length) obtenerCarreras();
+    if (!docentes.value.length) obtenerDocentes();
+}
+
+const abrirCrearMateria = () => {
+    cargarListasMateria();
+    esEdicionMateria.value = false;
+    formMateria.value = { id: null, subject_name: '', carrera_id: null, teacher_id: null };
+    dialogMateria.value = true;
+}
+
+const abrirEditarMateria = (item) => {
+    cargarListasMateria();
+    esEdicionMateria.value = true;
+    formMateria.value = {
+        id: item.id,
+        subject_name: item.subject_name,
+        carrera_id: item.carrera?.id ?? null,
+        teacher_id: item.teacher?.id ?? null,
+    };
+    dialogMateria.value = true;
+}
+
+const guardarMateria = async () => {
+    const { valid } = await formMateriaRef.value.validate();
+    if (!valid) return;
+
+    guardandoMateria.value = true;
+    const datos = {
+        subject_name: formMateria.value.subject_name.trim(),
+        carrera_id: formMateria.value.carrera_id,
+        teacher_id: formMateria.value.teacher_id,
+    };
+    const eventId = eventoMaterias.value.id;
+
+    const ok = esEdicionMateria.value
+        ? await actualizarMateria(eventId, formMateria.value.id, datos)
+        : await crearMateria(eventId, datos);
+    guardandoMateria.value = false;
+
+    if (ok) dialogMateria.value = false;
+    // se refresca siempre: si hubo timeout, el servidor pudo guardar igual
+    await cargarMaterias(esEdicionMateria.value ? (paginationMaterias.value?.current_page ?? 1) : 1);
+    // actualiza el contador de materias de la tabla de eventos
+    await refrescarTabla();
+}
+
+// deshabilitar o habilitar la materia
+const cambiarEstadoMateriaItem = async (item) => {
+    await cambiarEstadoMateria(eventoMaterias.value.id, item.id);
+    await cargarMaterias(paginationMaterias.value?.current_page ?? 1);
     await refrescarTabla();
 }
 

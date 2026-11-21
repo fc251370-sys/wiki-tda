@@ -1,11 +1,15 @@
-import { useEventoStore } from "../../../store/evento/useEvento.js"
-import { computed } from "vue"
+import { useEventoStore } from '../../../store/evento/useEvento.js'
+import { computed } from 'vue'
 
 export const useEventos = () => {
     const store = useEventoStore();
     const eventos = computed(() => store.eventos)
     const pagination = computed(() => store.pagination)
     const coordinadores = computed(() => store.coordinadores)
+    const materias = computed(() => store.materias)
+    const paginationMaterias = computed(() => store.paginationMaterias)
+    const carreras = computed(() => store.carreras)
+    const docentes = computed(() => store.docentes)
 
     const obtenerEventos = async (page = 1, filtros = {}) => {
         try {
@@ -65,10 +69,76 @@ export const useEventos = () => {
         }
     }
 
+    // materias del evento
+    const obtenerMaterias = async (eventId, page = 1) => {
+        try {
+            await store.getMaterias(eventId, { page });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const obtenerCarreras = async () => {
+        try {
+            await store.getCarrerasLista();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const obtenerDocentes = async () => {
+        try {
+            await store.getDocentes();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const crearMateria = async (eventId, data) => {
+        try {
+            const status = await store.crearMateria(eventId, data);
+            return status === 201;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    const actualizarMateria = async (eventId, id, data) => {
+        try {
+            const status = await store.actualizarMateria(eventId, id, data);
+            return status === 200;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
+    // deshabilitar / habilitar la materia (alterna "estado")
+    const cambiarEstadoMateria = async (eventId, id) => {
+        try {
+            const status = await store.cambiarEstadoMateria(eventId, id);
+            return status === 200;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    }
+
     return {
         eventos,
         pagination,
         coordinadores,
+        materias,
+        paginationMaterias,
+        carreras,
+        docentes,
+        obtenerMaterias,
+        obtenerCarreras,
+        obtenerDocentes,
+        crearMateria,
+        actualizarMateria,
+        cambiarEstadoMateria,
         obtenerEventos,
         obtenerCoordinadores,
         crearEvento,
