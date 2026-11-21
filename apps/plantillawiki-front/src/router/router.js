@@ -62,9 +62,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from) => {
-    console.log('guard:', from.path, '->', to.path, to.meta)
-
+router.beforeEach((to) => {
     const isAuthenticated = !!localStorage.getItem('token')
     const roles = getStoredList('roles')
 
@@ -76,7 +74,6 @@ router.beforeEach((to, from) => {
 
         const requiredRoles = to.matched.flatMap(record => record.meta.roles ?? [])
         if (requiredRoles.length && !requiredRoles.some(role => roles.includes(role))) {
-            console.warn('Sin permiso para', to.path, '| requiere:', requiredRoles, '| tienes:', roles)
             return { path: '/wiki' }
         }
 
