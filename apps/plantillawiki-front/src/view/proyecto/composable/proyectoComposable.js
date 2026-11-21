@@ -45,6 +45,16 @@ export const useProyectos = ()=>{
             }
         }
 
+        const activarProyecto = async(id)=>{
+            try {
+                const status = await store.activarProyecto(id);
+                return status === 200;
+            } catch (error) {
+                console.log(error);
+                return false;
+            }
+        }
+
         const crearProyecto = async(data)=>{
             try {
                 const status = await store.crearProyecto(data);
@@ -110,6 +120,7 @@ export const useProyectos = ()=>{
         actualizarProyecto,
         eliminarProyecto,
         crearProyecto,
+        activarProyecto,
         subirArchivo,
         actualizarArchivo,
         visualizarArchivo,
