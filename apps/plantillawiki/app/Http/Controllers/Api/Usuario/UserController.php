@@ -32,11 +32,14 @@ class UserController extends Controller
             'perPage' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'search' => ['nullable', 'string', 'max:100'],
             'role' => ['nullable', 'string', 'max:50'],
+            //se agrego el estado
+            'estado' => ['sometimes', 'boolean'],
         ]);
 
-        $perPage = $validated['perPage'] ?? 1;
+        //se amuento el page
+        $perPage = $validated['perPage'] ?? 10;
         $users = User::query()
-            ->select(['id', 'name', 'email', 'carnet_or_code'])
+            ->select(['id', 'name', 'email', 'carnet_or_code', 'carrera_id', 'estado'])
             ->with([
                 'roles:id,name,guard_name',
                 'permissions:id,name,guard_name',
@@ -51,6 +54,12 @@ class UserController extends Controller
 
             ->when($validated['role'] ?? null, function ($query, $role) {
                 $query->role($role, 'api');
+            })
+
+             // filtro  solo se aplica si el front lo manda si no no
+             //le quite la coma de arriba dabe error
+            ->when($request->has('estado'), function ($query) use ($request) {
+                $query->where('estado', $request->boolean('estado'));
             });
 
         $userPaginate = $users->paginate($perPage);
@@ -67,6 +76,9 @@ class UserController extends Controller
                 'nombre' => $user->name,
                 'email' => $user->email,
                 'carnet' => $user->carnet_or_code,
+                'carrera_id' => $user->carrera_id,
+                //se agrego el estado
+                'estado'=> $user->estado,
 
                 // Nombres de los roles asignados
                 'roles' => $user->getRoleNames()->values(),
