@@ -485,6 +485,7 @@ const cambiarEstado = async (item) => {
         await obtenerProyectos()
     }
 }
+
 // Cargar los proyectos
 onMounted(async () => {
     await obtenerProyectos()

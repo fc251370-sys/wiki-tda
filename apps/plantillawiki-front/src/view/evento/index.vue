@@ -7,10 +7,10 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col>
+            <v-col v-if="esGestor">
                 <v-btn v-tooltip:bottom="'Nuevo Evento'" color="primary" icon="mdi-plus" @click="abrirCrear"></v-btn>
             </v-col>
-            <v-col cols="auto">
+            <v-col v-if="esGestor" cols="auto">
                 <v-btn-toggle v-model="activoFiltro" mandatory color="primary" density="compact" divided>
                     <v-btn value="todos">Todos</v-btn>
                     <v-btn value="activo">Ciclo activo</v-btn>
@@ -36,13 +36,13 @@
             <template v-slot:item.acciones="{ item }">
                 <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verEvento(item)"></v-btn>
 
-                <v-btn v-if="item.estado" v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" @click="abrirEditar(item)"></v-btn>
+                <v-btn v-if="esGestor && item.estado" v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" @click="abrirEditar(item)"></v-btn>
 
                 <!-- activar o desactivar el ciclo (solo si el evento esta habilitado) -->
-                <v-btn v-if="item.estado" v-tooltip:bottom="item.is_active ? 'Desactivar ciclo' : 'Activar ciclo'" class="ml-2" density="compact" :icon="item.is_active ? 'mdi-pause-circle' : 'mdi-play-circle'" :color="item.is_active ? 'warning' : 'success'" @click="alternarActivo(item)"></v-btn>
+                <v-btn v-if="esGestor && item.estado" v-tooltip:bottom="item.is_active ? 'Desactivar ciclo' : 'Activar ciclo'" class="ml-2" density="compact" :icon="item.is_active ? 'mdi-pause-circle' : 'mdi-play-circle'" :color="item.is_active ? 'warning' : 'success'" @click="alternarActivo(item)"></v-btn>
 
                 <!-- deshabilitar o habilitar el evento -->
-                <v-btn v-tooltip:bottom="item.estado ? 'Deshabilitar' : 'Habilitar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
+                <v-btn v-if="esGestor" v-tooltip:bottom="item.estado ? 'Deshabilitar' : 'Habilitar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
             </template>
         </data-table-component>
 
@@ -112,6 +112,7 @@ import { ref, onMounted, watch } from 'vue'
 import DataTableComponent from '../../components/DataTableComponent.vue';
 import TitleComponent from '../../components/TitleComponent.vue';
 import { useEventos } from './composable/eventoComposable'
+import { hasRole } from '../../utils/authSession'
 
 const {
     eventos,
@@ -125,15 +126,26 @@ const {
     alternarActivoEvento,
 } = useEventos();
 
-const headers = ref([
-    { title: 'Ciclo', key: 'cicle_name' },
-    { title: 'Inicio', key: 'start_date' },
-    { title: 'Coordinador', key: 'coordinador' },
-    { title: 'Materias', key: 'subjects_count' },
-    { title: 'Ciclo activo', key: 'is_active' },
-    { title: 'Estado', key: 'estado' },
-    { title: 'Acciones', key: 'acciones' },
-]);
+// admin y coordinador gestionan los eventos; docente y estudiante solo ven el evento activo
+const esGestor = hasRole('admin', 'coordinador');
+
+const headers = ref(esGestor
+    ? [
+        { title: 'Ciclo', key: 'cicle_name' },
+        { title: 'Inicio', key: 'start_date' },
+        { title: 'Coordinador', key: 'coordinador' },
+        { title: 'Materias', key: 'subjects_count' },
+        { title: 'Ciclo activo', key: 'is_active' },
+        { title: 'Estado', key: 'estado' },
+        { title: 'Acciones', key: 'acciones' },
+    ]
+    : [
+        { title: 'Ciclo', key: 'cicle_name' },
+        { title: 'Inicio', key: 'start_date' },
+        { title: 'Coordinador', key: 'coordinador' },
+        { title: 'Materias', key: 'subjects_count' },
+        { title: 'Acciones', key: 'acciones' },
+    ]);
 
 // buscar y filtrar
 const search = ref('')
@@ -141,7 +153,8 @@ const activoFiltro = ref('todos');
 
 const filtros = () => ({
     cicle_name: search.value?.trim() || undefined,
-    is_active: activoFiltro.value === 'todos' ? undefined : activoFiltro.value === 'activo'
+    // quien no gestiona solo ve el evento activo
+    is_active: !esGestor ? true : (activoFiltro.value === 'todos' ? undefined : activoFiltro.value === 'activo')
 })
 
 watch(activoFiltro, async () => {
@@ -233,7 +246,8 @@ const cambiarEstado = async (item) => {
 }
 
 onMounted(async () => {
-    await obtenerEventos();
-    await obtenerCoordinadores();
+    await obtenerEventos(1, filtros());
+    // la lista de coordinadores solo hace falta para crear o editar
+    if (esGestor) await obtenerCoordinadores();
 })
 </script>
