@@ -48,7 +48,7 @@
                         <!--se arreglaron estos botnoes como los demas -->
                         <v-btn v-if="puedeGestionar && item.estado" v-tooltip:bottom="'Editar'" class="ml-2" density="compact" icon="mdi-pencil" @click="abrirEditar(item)"></v-btn>
 
-                        <v-btn v-if="puedeGestionar" v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
+                        <v-btn v-if="puedeGestionar && item.id != userId" v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'" class="ml-2" density="compact" :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'" :color="item.estado ? 'error' : 'success'" @click="cambiarEstado(item)"></v-btn>
                     </v-col>
                 </v-row>
             </template>
@@ -56,24 +56,39 @@
 
         <!--forms-->
 
-        <v-dialog v-model="dialogForm" max-width="500" persistent>
+        <v-dialog v-model="dialogForm" max-width="650" persistent>
     <v-card>
         <v-card-title>{{ esEdicion ? 'Editar usuario' : 'Crear usuario' }}</v-card-title>
         <v-card-text>
             <v-form ref="formUsuario">
-                <v-text-field
+                <v-row>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-text-field
+                        
                     v-model="form.name"
                     label="Nombre"
                     :rules="[v => !!v?.trim() || 'El nombre es obligatorio']"
                 />
-                <v-text-field
+                
+                    </v-col>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-text-field
                     v-model="form.email"
                     label="Correo"
                     type="email"
                     :rules="[v => !!v?.trim() || 'El correo es obligatorio', v => /.+@.+\..+/.test(v) || 'Correo no válido']"
                 />
-                <v-text-field v-model="form.carnet_or_code" label="Carnet o código" />
-                <v-text-field
+                
+                    </v-col>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-text-field v-model="form.carnet_or_code" label="Carnet o código" />
+                
+                    </v-col>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-text-field
+                        density="compact"
+                         variant="outlined"
+                      
                     v-model="form.password"
                     label="Contraseña"
                     type="password"
@@ -83,7 +98,10 @@
                         ? [v => !v || v.length >= 8 || 'Mínimo 8 caracteres']
                         : [v => !!v || 'La contraseña es obligatoria', v => v?.length >= 8 || 'Mínimo 8 caracteres']"
                 />
-                <v-select
+                
+                    </v-col>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-select
                     v-model="form.role"
                     :items="roles"
                     item-title="title"
@@ -91,7 +109,11 @@
                     label="Rol"
                     :rules="[v => !!v || 'El rol es obligatorio']"
                 />
-                <v-select
+                
+                    </v-col>
+                    <v-col cols="12" md="6" sm="12">
+                        <v-select
+                       
                     v-model="form.carrera_id"
                     :items="carreras"
                     item-title="name"
@@ -99,12 +121,15 @@
                     label="Carrera (opcional)"
                     clearable
                 />
+                    </v-col>
+                </v-row>
             </v-form>
+            <div class="flex gap-4 justify-center">
+                <v-btn @click="dialogForm = false" color="red" variant="outlined">Cancelar</v-btn>
+            <v-btn color="secondary" :loading="guardando" @click="guardar">Guardar</v-btn>  
+            </div>
         </v-card-text>
-        <v-card-actions>
-            <v-btn @click="dialogForm = false">Cancelar</v-btn>
-            <v-btn color="primary" :loading="guardando" @click="guardar">Guardar</v-btn>
-        </v-card-actions>
+        
     </v-card>
 </v-dialog>
 
@@ -124,6 +149,7 @@ import { useCarreras } from '../carrera/composable/carreraComposable.js';
 
 const puedeGestionar = hasRole('admin')
 const { carreras, obtenerCarreras } = useCarreras()
+const userId = ref(JSON.parse(localStorage.getItem('user'))?.id)
 
 
 const headers = ref([

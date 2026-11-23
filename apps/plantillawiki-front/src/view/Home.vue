@@ -1,8 +1,7 @@
 <template>
   <main class="home-page">
     <h1>Wiki TDA</h1>
-    <p>Conocimiento que conecta, tecnología que transforma.</p>
-    <v-btn to="/login" color="primary" variant="flat">Iniciar sesión</v-btn>
+    <p>Conocimiento que conecta, tecnología que transforma</p>
   </main>
 
 
