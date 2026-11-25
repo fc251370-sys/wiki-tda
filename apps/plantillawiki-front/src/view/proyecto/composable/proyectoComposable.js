@@ -57,11 +57,11 @@ export const useProyectos = ()=>{
 
         const crearProyecto = async(data)=>{
             try {
-                const status = await store.crearProyecto(data);
-                return status ===201;
+                const respuesta = await store.crearProyecto(data);
+                return respuesta;
             } catch (error) {
                 console.error(error);
-                return false;
+                return null;
             }
         }
         const subirArchivo = async (projectId, archivo) => {

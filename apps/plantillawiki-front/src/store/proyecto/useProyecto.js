@@ -65,7 +65,7 @@ export const useProyectoStore = defineStore('proyectos',{
             try {
                 const response = await crearProyecto(data);
 
-                return response.status;
+                return response.data;
             } catch (error) {
                 console.log(error);
                 return null;
