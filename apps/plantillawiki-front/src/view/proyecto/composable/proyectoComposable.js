@@ -45,13 +45,23 @@ export const useProyectos = ()=>{
             }
         }
 
+        const activarProyecto = async(id)=>{
+            try {
+                const status = await store.activarProyecto(id);
+                return status === 200;
+            } catch (error) {
+                console.log(error);
+                return false;
+            }
+        }
+
         const crearProyecto = async(data)=>{
             try {
-                const status = await store.crearProyecto(data);
-                return status ===201;
+                const respuesta = await store.crearProyecto(data);
+                return respuesta;
             } catch (error) {
                 console.error(error);
-                return false;
+                return null;
             }
         }
         const subirArchivo = async (projectId, archivo) => {
@@ -110,6 +120,7 @@ export const useProyectos = ()=>{
         actualizarProyecto,
         eliminarProyecto,
         crearProyecto,
+        activarProyecto,
         subirArchivo,
         actualizarArchivo,
         visualizarArchivo,

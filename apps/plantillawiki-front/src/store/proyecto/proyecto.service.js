@@ -4,6 +4,7 @@ const proyectos = async(params = {}) => await api.get('proyectos', {params})
 const crearProyecto = async(data)=>await api.post('proyectos/crear', data)
 const actualizarProyecto =async(id, data)=>await api.put(`proyectos/${id}`,data)
 const eliminarProyecto = async(id)=>await api.delete(`proyectos/${id}`)
+const activarProyecto = async (id) => await api.put(`proyectos/${id}/activar`)
 const eliminarArchivo = async(id) => await api.delete(`proyectos/archivos/${id}`)
 
 const subirArchivo = async (projectId, archivo) => {
@@ -56,6 +57,7 @@ export {
     crearProyecto,
     actualizarProyecto,
     eliminarProyecto,
+    activarProyecto,
     subirArchivo,
     actualizarArchivo,
     visualizarArchivo,

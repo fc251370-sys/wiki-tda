@@ -23,7 +23,7 @@ export const menuItems = [
         icon: 'mdi-school-outline',
         to: '/carrera',
         requiresAuth: true,
-        roles: ['admin', 'coordinador', 'teacher', 'student'],
+        roles: ['admin', 'coordinador', 'teacher'],
     },
     {
         title: 'Eventos',

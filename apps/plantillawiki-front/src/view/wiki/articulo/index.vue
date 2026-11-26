@@ -1,8 +1,10 @@
 <template>
   <div>
-    <!-- boton volver-->
+    <title-component :title="'Listado de artículos'"></title-component>
+
+    <!-- botón volver -->
     <v-btn prepend-icon="mdi-arrow-left" variant="text" @click="$router.push('/wiki')">
-    Volver
+      Volver
     </v-btn>
 
     <!-- buscador -->
@@ -13,13 +15,14 @@
           variant="outlined"
           clearable
           density="compact"
+          placeholder="Buscar"
           rounded-xl
           append-inner-icon="mdi-magnify"
-        />
+        ></v-text-field>
       </v-col>
     </v-row>
 
-    <!-- botón nuevo articulo -->
+    <!-- botón nuevo artículo + filtro de estado -->
     <v-row>
       <v-col>
         <v-btn
@@ -38,18 +41,17 @@
       </v-col>
     </v-row>
 
-    <!-- Tabla de articulos -->
+    <!-- tabla de artículos -->
     <data-table-component
-      :key="tablaKey"
-      :totalPage="pagination?.last_page"
-      :page="pagination?.current_page"
       :headers="headers"
       :items="articulos"
-      @update:page="paginationMethod"
+      :totalPage="pagination?.last_page"
+      :page="pagination?.current_page"
+      @update:page="changePage"
     >
       <!-- estado -->
       <template v-slot:item.estado="{ item }">
-        <v-chip :color="item.estado ? 'success' : 'error'">
+        <v-chip :color="item.estado ? 'success' : 'error'" size="small">
           {{ item.estado ? 'Activo' : 'Inactivo' }}
         </v-chip>
       </template>
@@ -67,131 +69,109 @@
         </v-btn>
       </template>
 
-      <!-- botones de accion -->
+      <!-- acciones -->
       <template v-slot:item.acciones="{ item }">
-        <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verArticulo(item)" />
-        <v-btn
-          v-tooltip:bottom="'Editar'"
-          class="ml-2"
-          density="compact"
-          icon="mdi-pencil"
-          v-if="item.estado"
-          @click="ActualizarArticulo(item)"
-        />
-        <v-btn
-          v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'"
-          class="ml-2"
-          density="compact"
-          :icon="item.estado ? 'mdi-cancel' : 'mdi-check-circle'"
-          :color="item.estado ? 'error' : 'success'"
-          @click="cambiarEstado(item)"
-        />
+        <v-row>
+          <v-col cols="12" col-md="4" col-sm="3">
+            <v-btn v-tooltip:bottom="'Ver'" density="compact" icon="mdi-eye" @click="verArticulo(item)"></v-btn>
+
+            <v-btn
+              v-if="item.estado"
+              v-tooltip:bottom="'Editar'"
+              class="ml-2"
+              density="compact"
+              icon="mdi-pencil"
+              @click="abrirEditar(item)"
+            ></v-btn>
+
+            <v-btn
+              v-tooltip:bottom="item.estado ? 'Desactivar' : 'Activar'"
+              class="ml-2"
+              density="compact"
+              :icon="item.estado ? 'mdi mdi-cancel' : 'mdi mdi-check-circle'"
+              :color="item.estado ? 'error' : 'success'"
+              @click="cambiarEstado(item)"
+            ></v-btn>
+          </v-col>
+        </v-row>
       </template>
     </data-table-component>
 
-    <!-- Diálogo ver artículo -->
-    <v-dialog v-model="dialogVerArticulo" persistent>
-      <v-card class="mx-auto my-8" elevation="4" width="600" rounded="lg">
-        <v-card-item>
-          <v-card-title>{{ articulo.title }}</v-card-title>
-        </v-card-item>
+    <!-- diálogo ver artículo -->
+    <v-dialog v-model="dialogVer" max-width="650" persistent>
+      <v-card>
+        <v-card-title>{{ articulo.title }}</v-card-title>
         <v-card-text>
           <div><strong>Slug:</strong> {{ articulo.slug }}</div>
           <div><strong>Contenido:</strong> {{ articulo.content }}</div>
           <div><strong>Publicado:</strong> {{ articulo.is_published ? 'Sí' : 'No' }}</div>
           <div><strong>Categoría:</strong> {{ articulo.category?.name }}</div>
           <div><strong>Autor:</strong> {{ articulo.author?.name }}</div>
+          <div class="mt-2">
+            <strong>Tags:</strong>
+            <v-chip v-for="tag in articulo.tags" :key="tag.id" size="small" class="ml-1">
+              {{ tag.name }}
+            </v-chip>
+          </div>
+          <div class="flex gap-4 justify-center mt-4">
+            <v-btn @click="dialogVer = false" color="red" variant="outlined">Cerrar</v-btn>
+          </div>
         </v-card-text>
-        <v-card-actions>
-          <v-row>
-            <v-col cols="12" class="text-center">
-              <v-btn rounded="lg" variant="outlined" color="error" text @click="dialogVerArticulo = false">
-                Cerrar
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <!-- editar articulo -->
-    <v-dialog v-model="dialogActualizarArticulo" max-width="600" persistent>
+    <!-- formulario crear / editar -->
+    <v-dialog v-model="dialogForm" max-width="650" persistent>
       <v-card>
-        <v-card-title>Editar artículo</v-card-title>
+        <v-card-title>{{ esEdicion ? 'Editar artículo' : 'Crear artículo' }}</v-card-title>
         <v-card-text>
-          <v-form ref="formEditar">
-            <v-text-field
-              v-model="form.title"
-              label="Título"
-              :rules="[v => !!v?.trim() || 'El título es obligatorio']"
-            />
-            <v-textarea v-model="form.content" label="Contenido" rows="4" />
-            <v-select
-              v-model="form.category_id"
-              :items="categorias"
-              item-title="name"
-              item-value="id"
-              label="Categoría"
-              :rules="[v => !!v || 'La categoría es obligatoria']"
-            />
-            <v-select
-              v-model="form.tags"
-              :items="tags"
-              item-title="name"
-              item-value="id"
-              label="Tags"
-              multiple
-              chips
-            />
-            <v-switch v-model="form.is_published" label="Publicado" />
+          <v-form ref="formArticulo">
+            <v-row>
+              <v-col cols="12" md="6" sm="12">
+                <v-text-field
+                  v-model="form.title"
+                  label="Título"
+                  :rules="[
+                    v => !!v?.trim() || 'El título es obligatorio',
+                    v => v?.trim().length >= 3 || 'Mínimo 3 caracteres'
+                  ]"
+                />
+              </v-col>
+              <v-col cols="12" md="6" sm="12">
+                <v-select
+                  v-model="form.category_id"
+                  :items="categorias"
+                  item-title="name"
+                  item-value="id"
+                  label="Categoría"
+                  :rules="[v => !!v || 'La categoría es obligatoria']"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-textarea v-model="form.content" label="Contenido" rows="4" />
+              </v-col>
+              <v-col cols="12" md="6" sm="12">
+                <v-select
+                  v-model="form.tags"
+                  :items="tags"
+                  item-title="name"
+                  item-value="id"
+                  label="Tags"
+                  multiple
+                  chips
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="6" sm="12">
+                <v-switch v-model="form.is_published" label="Publicado" color="primary" />
+              </v-col>
+            </v-row>
           </v-form>
+          <div class="flex gap-4 justify-center">
+            <v-btn @click="dialogForm = false" color="red" variant="outlined">Cancelar</v-btn>
+            <v-btn color="secondary" :loading="guardando" @click="guardar">Guardar</v-btn>
+          </div>
         </v-card-text>
-        <v-card-actions>
-          <v-btn @click="dialogActualizarArticulo = false">Cancelar</v-btn>
-          <v-btn color="primary" :loading="guardando" @click="guardarEdicion">Guardar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- crear articulo -->
-    <v-dialog v-model="dialogCrearArticulo" max-width="600" persistent>
-      <v-card>
-        <v-card-title>Crear artículo</v-card-title>
-        <v-card-text>
-          <v-form ref="formNueva">
-            <v-text-field
-              v-model="nuevoArticulo.title"
-              label="Título"
-              :rules="[
-                v => !!v?.trim() || 'El título es obligatorio',
-                v => v?.trim().length >= 3 || 'Mínimo 3 caracteres'
-              ]"
-            />
-            <v-textarea v-model="nuevoArticulo.content" label="Contenido" rows="4" />
-            <v-select
-              v-model="nuevoArticulo.category_id"
-              :items="categorias"
-              item-title="name"
-              item-value="id"
-              label="Categoría"
-              :rules="[v => !!v || 'La categoría es obligatoria']"
-            />
-            <v-select
-              v-model="nuevoArticulo.tags"
-              :items="tags"
-              item-title="name"
-              item-value="id"
-              label="Tags"
-              multiple
-              chips
-            />
-            <v-switch v-model="nuevoArticulo.is_published" label="Publicado" />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn @click="dialogCrearArticulo = false">Cancelar</v-btn>
-          <v-btn color="primary" :loading="creando" @click="guardarNueva">Guardar</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
@@ -199,38 +179,11 @@
 
 <script setup>
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
+import TitleComponent from '../../../components/TitleComponent.vue'
 import DataTableComponent from '../../../components/DataTableComponent.vue'
 import { useArticulos } from './composable/articuloComposable.js'
 import { useCategorias } from '../../wikiconf/categoria/composable/categoriaComposable.js'
 import { useTags } from '../../wikiconf/tag/composable/tagComposable.js'
-
-
-// Crear
-const dialogCrearArticulo = ref(false)
-const nuevoArticulo = ref({ title: '', content: '', category_id: null, tags: [], is_published: false })
-const formNueva = ref(null)
-const creando = ref(false)
-
-// Ver
-const dialogVerArticulo = ref(false)
-const articulo = ref(null)
-
-// Editar
-const dialogActualizarArticulo = ref(false)
-const form = ref({ id: null, title: '', content: '', category_id: null, tags: [], is_published: false })
-const formEditar = ref(null)
-const guardando = ref(false)
-
-// Buscador
-const search = ref('')
-let searchTimeout
-
-// Filtro
-const estadoFiltro = ref('todas')
-const filtros = () => ({
-  title: search.value?.trim() || undefined,
-  estado: estadoFiltro.value === 'todas' ? undefined : estadoFiltro.value === 'activas'
-})
 
 // Composable artículos
 const {
@@ -238,9 +191,8 @@ const {
   obtenerArticulos, actualizarArticulos, eliminarArticulos, crearArticulos
 } = useArticulos()
 
-// Composable categorías (solo para selects)
+// Composables para los selects
 const { categorias, obtenerCategorias } = useCategorias()
-// Composable tags (solo para selects)
 const { tags, obtenerTags } = useTags()
 
 // Headers
@@ -253,17 +205,37 @@ const headers = ref([
   { title: 'Acciones', key: 'acciones' },
 ])
 
-// Filtro
-watch(estadoFiltro, async () => {
-  await obtenerArticulos(1, filtros())
+// Buscador y filtro
+const search = ref('')
+const estadoFiltro = ref('todas')
+let searchTimeout
+
+const filtros = () => ({
+  title: search.value?.trim() || undefined,
+  estado: estadoFiltro.value === 'todas' ? undefined : estadoFiltro.value === 'activas'
 })
 
-// Paginación
-const paginationMethod = async (page) => {
+// Estado de diálogos
+const dialogVer = ref(false)
+const articulo = ref({})
+
+const dialogForm = ref(false)
+const esEdicion = ref(false)
+const formArticulo = ref(null)
+const guardando = ref(false)
+
+const formVacio = () => ({ id: null, title: '', content: '', category_id: null, tags: [], is_published: false })
+const form = ref(formVacio())
+
+// Recarga conservando la página actual (o yendo a la indicada)
+const recargar = async (page) => {
+  await obtenerArticulos(page ?? pagination.value?.current_page ?? 1, filtros())
+}
+
+const changePage = async (page) => {
   await obtenerArticulos(page, filtros())
 }
 
-// Buscador
 watch(search, () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
@@ -271,115 +243,81 @@ watch(search, () => {
   }, 300)
 })
 
-//funcion de recarga de articulos
-const recargar = async () => {
-//pide la lista y la guarda y vuelve a crear la lista, este key esta tambien en la tabla
-  await obtenerArticulos(1, filtros())
-  tablaKey.value++
-}
+watch(estadoFiltro, () => obtenerArticulos(1, filtros()))
 
-onBeforeUnmount(() => clearTimeout(searchTimeout))
-
-// Ver
+// Funciones
 const verArticulo = (item) => {
-  dialogVerArticulo.value = true
   articulo.value = item
+  dialogVer.value = true
 }
 
-// Abrir edición
-const ActualizarArticulo = (item) => {
+const abrirCrear = () => {
+  esEdicion.value = false
+  form.value = formVacio()
+  dialogForm.value = true
+}
+
+const abrirEditar = (item) => {
+  esEdicion.value = true
   form.value = {
     id: item.id,
     title: item.title,
     content: item.content,
-    category_id: item.category?.id,
+    category_id: item.category?.id ?? null,
     tags: item.tags?.map(t => t.id) || [],
     is_published: item.is_published
   }
-  dialogActualizarArticulo.value = true
-  articulo.value = item
+  dialogForm.value = true
 }
 
-// Guardar edición
-const guardarEdicion = async () => {
-  const { valid } = await formEditar.value.validate()
+const guardar = async () => {
+  const { valid } = await formArticulo.value.validate()
   if (!valid) return
 
   guardando.value = true
-  const ok = await actualizarArticulos(form.value.id, {
-    title: form.value.title,
+  const datos = {
+    title: form.value.title.trim(),
     content: form.value.content,
     category_id: form.value.category_id,
     tags: form.value.tags,
     is_published: form.value.is_published
-  })
+  }
+
+  const ok = esEdicion.value
+    ? await actualizarArticulos(form.value.id, datos)
+    : await crearArticulos(datos)
   guardando.value = false
 
   if (ok) {
-    dialogActualizarArticulo.value = false
-    await recargar()
+    dialogForm.value = false
+    await recargar(esEdicion.value ? undefined : 1)
   }
 }
-
-// Cambiar estado
-const tablaKey = ref(0)
 
 const cambiarEstado = async (item) => {
-    const ok = await eliminarArticulos(item.id)
-    if (ok) {
-        await obtenerArticulos(1, filtros())
-        tablaKey.value++
-    }
+  const ok = await eliminarArticulos(item.id)
+  if (ok) await recargar()
 }
 
-// Abrir crear
-const abrirCrear = () => {
-  nuevoArticulo.value = { title: '', content: '', category_id: null, tags: [], is_published: false }
-  dialogCrearArticulo.value = true
-}
-
-// Guardar nueva
-const guardarNueva = async () => {
-  const { valid } = await formNueva.value.validate()
-  if (!valid) return
-
-  creando.value = true
-  const ok = await crearArticulos({
-    title: nuevoArticulo.value.title,
-    content: nuevoArticulo.value.content,
-    category_id: nuevoArticulo.value.category_id,
-    tags: nuevoArticulo.value.tags,
-    is_published: nuevoArticulo.value.is_published
-  })
-  creando.value = false
-
-  if (ok) {
-    dialogCrearArticulo.value = false
-    await recargar()
-  }
-}
-
-//cambiar estado de publicado 
 const cambiarPublicado = async (item) => {
   const ok = await actualizarArticulos(item.id, {
     title: item.title,
     content: item.content,
     category_id: item.category?.id,
+    tags: item.tags?.map(t => t.id) || [],
     is_published: !item.is_published
   })
-
-  if (ok) {
-    await recargar()
-  }
+  if (ok) await recargar()
 }
 
-// Carga inicial: artículos + categorías + tags para los selects
+// Carga inicial: artículos + categorías + tags (solo activas) para los selects
 onMounted(async () => {
   await Promise.all([
     obtenerArticulos(1, filtros()),
-    obtenerCategorias(1, { estado: true }),   // solo activas
-    obtenerTags(1, { estado: true }),         // solo activas
+    obtenerCategorias(1, { estado: true }),
+    obtenerTags(1, { estado: true }),
   ])
 })
 
+onBeforeUnmount(() => clearTimeout(searchTimeout))
 </script>
