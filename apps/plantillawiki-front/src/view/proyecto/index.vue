@@ -16,6 +16,7 @@
             clearable
         />
     <v-btn
+        v-if="!esEstudiante"
         color="primary"
         prepend-icon="mdi-plus"
         class="my-3"
@@ -60,6 +61,7 @@
                     @click="verProyecto(proyecto)"
                 />
                 <v-btn
+                    v-if="!esEstudiante"
                     v-tooltip:bottom="'Editar'"
                     icon="mdi-pencil"
                     color="primary"
@@ -67,7 +69,7 @@
                     @click="editarProyecto(proyecto)"
                 />
                 <v-btn
-                    v-if="proyecto.estado"
+                    v-if="!esEstudiante && proyecto.estado"
                     v-tooltip:bottom="'Desactivar'"
                     icon="mdi-cancel"
                     color="error"
@@ -76,7 +78,7 @@
                 />
 
                 <v-btn
-                    v-if="!proyecto.estado"
+                    v-if="!esEstudiante && !proyecto.estado"
                     v-tooltip:bottom="'Activar'"
                     icon="mdi-check-circle"
                     color="success"
@@ -134,6 +136,7 @@
 
     
     <v-btn
+        v-if="!esEstudiante"
         size="small"
         color="warning"
         @click="$event.currentTarget.parentElement.querySelector('input').click()"
@@ -142,6 +145,7 @@
     </v-btn>
 
     <v-btn
+        v-if="!esEstudiante"
         size="small"
         color="error"
         @click="borrarArchivo(archivo)"
@@ -159,19 +163,22 @@
 </li>
         </ul>
     </div>
-        <div class="mt-4">
+        <div v-if="!esEstudiante" class="mt-4">
     <strong>Adjuntar archivos:</strong>
 
     <v-file-input
+        v-if="!esEstudiante"
         v-model="archivoSeleccionado"
         label="Seleccionar archivo"
         variant="outlined"
         density="compact"
+
         accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
         prepend-icon="mdi-paperclip"
         show-size
     />
     <v-btn
+        v-if="!esEstudiante"
         color="primary"
         block
         @click="guardarArchivo"
@@ -259,6 +266,16 @@
                 label="URL del repositorio"
                 variant="outlined"
             />
+
+            <v-file-input
+                v-model="archivosNuevoProyecto"
+                label="Adjuntar archivos"
+                variant="outlined"
+                multiple
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+            />
+
+
         </v-card-text>
 
         <v-card-actions>
@@ -304,6 +321,8 @@ const dialogVerProyecto = ref(false)
 
 const archivoSeleccionado = ref(null)
 
+const archivosNuevoProyecto = ref([])
+
 const dialogEditarProyecto = ref(false)
 
 
@@ -325,6 +344,9 @@ const proyecto = ref(null)
 // Pestaña seleccionada
 const tabProyecto = ref('todos')
 const busqueda = ref('')
+// Identificar si el usuario que inició sesión es estudiante
+const esEstudiante = JSON.parse(localStorage.getItem('roles') ||
+ '[]').includes('student')
 watch(busqueda, (nuevoValor) => {
     obtenerProyectos(1, {
         search: nuevoValor
@@ -363,11 +385,23 @@ const {
 } = useProyectos()
 
 const guardarProyecto = async () => {
+    // Crear el proyecto
     const respuesta = await crearProyecto(nuevoProyecto.value)
 
-    if (respuesta) {
+    if (respuesta && respuesta.data) {
+
+        // Obtener el ID del proyecto recién creado
+        const proyectoId = respuesta.data.id
+
+        // Subir los archivos seleccionados
+        for (const archivo of archivosNuevoProyecto.value) {
+            await subirArchivo(proyectoId, archivo)
+        }
+
+        // Cerrar el formulario
         dialogAgregarProyecto.value = false
 
+        // Limpiar los datos del proyecto
         nuevoProyecto.value = {
             event_subject_id: 1,
             title: '',
@@ -375,6 +409,10 @@ const guardarProyecto = async () => {
             repository_url: ''
         }
 
+        // Limpiar los archivos seleccionados
+        archivosNuevoProyecto.value = []
+
+        // Actualizar la lista de proyectos
         await obtenerProyectos()
     }
 }
@@ -495,7 +533,6 @@ const cambiarEstado = async (item) => {
         await obtenerProyectos()
     }
 }
-
 
 const activarEstado = async (item) => {
     const confirmar = window.confirm(
